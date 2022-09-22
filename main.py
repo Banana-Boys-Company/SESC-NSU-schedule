@@ -1,24 +1,56 @@
 from flask import Flask, render_template, url_for
-import datetime
+from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
 
+app.config['SECRET_KEY'] = '&85e8hE1%J2&eH(D*E8i2v)5DoquH*)D'
 
-class Table:
-    def __init__(self, class_number, group_number):
+socketio = SocketIO(app)
+
+
+class Classes_data:
+    def __init__(self, class_ids: list = None):
+        self.class_ids = class_ids
+
+
+class Class_info(Classes_data):
+    def __init__(self, class_number: str = None, group_number=None):
         self.class_number = class_number
         self.group_number = group_number
+        if class_number is not None:
+            self.status = 200
 
 
-class_data = Table("10-4", "207")
+global_data = Classes_data(["9-1", "9-2", "10-1", "10-2", "10-3", "10-4"])
 
-class_nums = []
+
+def get_class_info(item_id: str):
+    data = Class_info(item_id.split(":")[0], item_id.split(":")[-1])
+    return {"class_number": data.class_number, "status": data.status}
+
+
+@socketio.on("connect")
+def getConnection(data):
+    print("Connected")
+
+
+@socketio.on("getClassData")
+def responseData(data):
+    print("response-data")
+
+    if (isinstance(data, dict)) and ('item_id' in data.keys()):
+        print(data)
+        if data['item_id'].split(":")[0] in global_data.class_ids:
+            print(get_class_info(data['item_id']))
+            emit('schedule', get_class_info(data['item_id']))
+            return
+    return url_for("index")
 
 
 @app.route("/")
 def index():
-    return render_template("table.html", table_data=class_nums)
+    return render_template("table.html")
 
 
 if __name__ == '__main__':
-    app.run(port=80, host="0.0.0.0", debug=True)
+    socketio.run(app, port=80, host="127.0.0.1", debug=True)

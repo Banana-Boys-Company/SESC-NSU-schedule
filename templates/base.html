@@ -1,196 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title></title>
+	<title>Расписание | СУНЦ НГУ</title>
 	{% block local_data %}
 	{% endblock %}
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css"/>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css" />
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+	<script src="https://cdn.socket.io/4.4.1/socket.io.min.js">
+	</script>
+	<script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
 	<nav class="navbar navbar-expand-lg navbar-light bg-light">
 		<div class="container-fluid ">
-			<img src="https://education.nsu.ru/letka/images/tild3438-3932-4535-b763-356533303566__photo.png" alt="logo" class="lgbt">
+			<img src="https://education.nsu.ru/letka/images/tild3438-3932-4535-b763-356533303566__photo.png" alt="logo"
+				class="lgbt">
 
-			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Переключатель навигации">
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+				data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+				aria-label="Переключатель навигации">
 				<span class="navbar-toggler-icon"></span>
 			</button>
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
 				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-							9 класс						
+						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+							data-bs-toggle="dropdown" aria-expanded="false">
+							9 класс
 						</a>
 						<ul class="dropdown-menu" aria-labelledby="navbarDropdown" id="list">
 							<li><a class="dropdown-item" href="#">9-1</a>
 								<div class="dropdown-menu">
-									<a class="dropdown-item" href="#">200</a>
-									<a class="dropdown-item" href="#">201</a>
-									<a class="dropdown-item" href="#">202</a>
+									<a class="dropdown-item get-table" href="#" id="9-1:200">200</a>
+									<a class="dropdown-item get-table" href="#" id="9-1:201">201</a>
+									<a class="dropdown-item get-table" href="#" id="9-1:202">202</a>
 								</div>
 							</li>
 							<li><a class="dropdown-item" href="#">9-2</a>
 								<div class="dropdown-menu">
-									<a class="dropdown-item" href="#">203</a>
-									<a class="dropdown-item" href="#">204</a>
+									<a class="dropdown-item get-table" href="#" id="9-2:203">203</a>
+									<a class="dropdown-item get-table" href="#" id="9-2:204">204</a>
 								</div>
 							</li>
 						</ul>
 					</li>
 					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-							10 класс						
+						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button"
+							data-bs-toggle="dropdown" aria-expanded="false">
+							10 класс
 						</a>
-						<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
 							<li><a class="dropdown-item" href="#">10-1</a>
 								<div class="dropdown-menu">
-									<a class="dropdown-item" href="#">101</a>
-									<a class="dropdown-item" href="#">102</a>
+									<a class="dropdown-item get-table" href="#" id="10-1:101">101</a>
+									<a class="dropdown-item get-table" href="#" id="10-1:102">102</a>
 								</div>
 							</li>
 							<li><a class="dropdown-item" href="#">10-2</a>
 								<div class="dropdown-menu">
-									<a class="dropdown-item" href="#">103</a>
-									<a class="dropdown-item" href="#">104</a>
-								</div></li>
-								<li><a class="dropdown-item" href="#">10-3</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">205</a>
-										<a class="dropdown-item" href="#">206</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">10-4</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">207</a>
-										<a class="dropdown-item" href="#">208</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">10-5</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">209</a>
-										<a class="dropdown-item" href="#">210</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">10-6</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">211</a>
-										<a class="dropdown-item" href="#">212</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">10-7</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">213</a>
-										<a class="dropdown-item" href="#">214</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">10-8</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">215</a>
-										<a class="dropdown-item" href="#">216</a>
-									</div>
-								</li>
-							</ul>
-						</li>
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-								11 класс
-							</a>
-							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-								<li><a class="dropdown-item" href="#">11-1</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">001</a>
-										<a class="dropdown-item" href="#">002</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">11-2</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">003</a>
-										<a class="dropdown-item" href="#">004</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">11-3</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">005</a>
-										<a class="dropdown-item" href="#">006</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">11-4</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">105</a>
-										<a class="dropdown-item" href="#">106</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">11-5</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">107</a>
-										<a class="dropdown-item" href="#">108</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">11-6</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">109</a>
-										<a class="dropdown-item" href="#">110</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">11-7</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">111</a>
-										<a class="dropdown-item" href="#">112</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">11-8</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">113</a>
-										<a class="dropdown-item" href="#">114</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">11-9</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">115</a>
-										<a class="dropdown-item" href="#">116</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">11-10</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">217</a>
-										<a class="dropdown-item" href="#">218</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">11-11</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">219</a>
-										<a class="dropdown-item" href="#">220</a>
-									</div>
-								</li>
-								<li><a class="dropdown-item" href="#">11-12</a>
-									<div class="dropdown-menu">
-										<a class="dropdown-item" href="#">221</a>
-										<a class="dropdown-item" href="#">222</a>
-									</div>
-								</li>
-							</ul>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="#">СПЕЦ-КУРСЫ</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="#">Расисание физкультуры + ОБЖ</a>
-						</li>
-					</ul>
-				</div>
+									<a class="dropdown-item get-table" href="#" id="10-2:103">103</a>
+									<a class="dropdown-item get-table" href="#" id="10-2:104">104</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">10-3</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="10-3:205">205</a>
+									<a class="dropdown-item get-table" href="#" id="10-3:206">206</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">10-4</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="10-4:207">207</a>
+									<a class="dropdown-item get-table" href="#" id="10-4:208">208</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">10-5</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="10-5:209">209</a>
+									<a class="dropdown-item get-table" href="#" id="10-5:210">210</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">10-6</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="10-6:211">211</a>
+									<a class="dropdown-item get-table" href="#" id="10-6:212">212</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">10-7</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="10-7:213">213</a>
+									<a class="dropdown-item get-table" href="#" id="10-7:214">214</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">10-8</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="10-8:215">215</a>
+									<a class="dropdown-item get-table" href="#" id="10-8:216">216</a>
+								</div>
+							</li>
+						</ul>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button"
+							data-bs-toggle="dropdown" aria-expanded="false">
+							11 класс
+						</a>
+						<ul class="dropdown-menu" aria-labelledby="navbarDropdown2">
+							<li><a class="dropdown-item" href="#">11-1</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="11-1:001">001</a>
+									<a class="dropdown-item get-table" href="#" id="11-1:002">002</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">11-2</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="11-2:003">003</a>
+									<a class="dropdown-item get-table" href="#" id="11-2:004">004</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">11-3</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="11-3:005">005</a>
+									<a class="dropdown-item get-table" href="#" id="11-3:006">006</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">11-4</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="11-4:105">105</a>
+									<a class="dropdown-item get-table" href="#" id="11-4:106">106</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">11-5</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="11-5:107">107</a>
+									<a class="dropdown-item get-table" href="#" id="11-5:108">108</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">11-6</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="11-6:109">109</a>
+									<a class="dropdown-item get-table" href="#" id="11-6:110">110</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">11-7</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="11-7:107">107</a>
+									<a class="dropdown-item get-table" href="#" id="11-7:112">112</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">11-8</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="11-8:113">113</a>
+									<a class="dropdown-item get-table" href="#" id="11-8:114">114</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">11-9</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="11-9:115">115</a>
+									<a class="dropdown-item get-table" href="#" id="11-9:116">116</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">11-10</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="11-10:217">217</a>
+									<a class="dropdown-item get-table" href="#" id="11-10:218">218</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">11-11</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="11-11:219">219</a>
+									<a class="dropdown-item get-table" href="#" id="11-11:220">220</a>
+								</div>
+							</li>
+							<li><a class="dropdown-item" href="#">11-12</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item get-table" href="#" id="11-12:221">221</a>
+									<a class="dropdown-item get-table" href="#" id="11-12:222">222</a>
+								</div>
+							</li>
+						</ul>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#">СПЕЦ-КУРСЫ</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#">Расисание физкультуры + ОБЖ</a>
+					</li>
+				</ul>
 			</div>
-		</nav>
-	</head>
-	<body>
-		<div>
-
-			{% block table %}
-
-			{% endblock %}
 		</div>
-		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	</nav>
+</head>
 
-	</body>
-	</html>
+<body>
+	<div>
+
+		{% block table %}
+
+		{% endblock %}
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+		crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+		integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+		crossorigin="anonymous"></script>
+
+</body>
+
+</html>
