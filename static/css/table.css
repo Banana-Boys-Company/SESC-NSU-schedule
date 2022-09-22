@@ -1,0 +1,10 @@
+#pills-tab{
+	padding-top: 10px;
+	max-width: 30%;
+}
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+	background-color: #198754!important;
+}
+.nav-link {
+	color: black!important;
+}

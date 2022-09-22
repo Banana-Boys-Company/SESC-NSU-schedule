@@ -1,0 +1,25 @@
+.lgbt {
+    margin-left: 2px;
+    margin-right: 5%;
+    max-width: 100px;
+    height: auto;   
+}
+img {
+   pointer-events: none;
+}
+.dropdown-menu .dropdown-menu {
+   top: auto;
+   left: 100%;
+   transform: translateY(-5rem);
+}
+.dropdown-item + .dropdown-menu {
+   display: none;
+}
+.dropdown-item.submenu::after {
+   content: '▸';
+   margin-left: 0.5rem;
+}
+.dropdown-item:hover + .dropdown-menu,
+.dropdown-menu:hover {
+   display: block;
+}
