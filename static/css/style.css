@@ -1,3 +1,4 @@
+/*стили для логотипа*/
 .lgbt {
     margin-left: 2px;
     margin-right: 5%;
@@ -7,6 +8,7 @@
 img {
    pointer-events: none;
 }
+/*стили для dropdown*/
 .dropdown-menu .dropdown-menu {
    top: auto;
    left: 100%;
@@ -14,10 +16,6 @@ img {
 }
 .dropdown-item + .dropdown-menu {
    display: none;
-}
-.dropdown-item.submenu::after {
-   content: '▸';
-   margin-left: 0.5rem;
 }
 .dropdown-item:hover + .dropdown-menu,
 .dropdown-menu:hover {

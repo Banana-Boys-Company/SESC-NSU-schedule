@@ -9,36 +9,71 @@
 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
   <li class="nav-item" role="presentation">
     <button class="nav-link active" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"
-      type="button" role="tab" aria-controls="Monday" aria-selected="true">Пн</button>
+    type="button" role="tab" aria-controls="Monday" aria-selected="true">Пн</button>
   </li>
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="pills-Tuesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Tuesday" type="button"
-      role="tab" aria-controls="week-Tuesday" aria-selected="false">Вт</button>
+    role="tab" aria-controls="week-Tuesday" aria-selected="false">Вт</button>
   </li>
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="pills-Wednesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Wednesday"
-      type="button" role="tab" aria-controls="week-Wednesday" aria-selected="false">Ср</button>
+    type="button" role="tab" aria-controls="week-Wednesday" aria-selected="false">Ср</button>
   </li>
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="pills-Thursday-tab" data-bs-toggle="pill" data-bs-target="#pills-Thursday"
-      type="button" role="tab" aria-controls="week-Thursday" aria-selected="false">Чт</button>
+    type="button" role="tab" aria-controls="week-Thursday" aria-selected="false">Чт</button>
   </li>
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="pills-Friday-tab" data-bs-toggle="pill" data-bs-target="#pills-Friday" type="button"
-      role="tab" aria-controls="week-Friday" aria-selected="false">Пт</button>
+    role="tab" aria-controls="week-Friday" aria-selected="false">Пт</button>
   </li>
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="pills-Saturday-tab" data-bs-toggle="pill" data-bs-target="#pills-Saturday"
-      type="button" role="tab" aria-controls="week-Saturday" aria-selected="false">Сб</button>
+    type="button" role="tab" aria-controls="week-Saturday" aria-selected="false">Сб</button>
   </li>
 </ul>
 <div class="tab-content" id="weeks-tabContent">
-  <div class="tab-pane fade show active" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab">1</div>
-  <div class="tab-pane fade" id="pills-Tuesday" role="tabpanel" aria-labelledby="pill-Tuesday-tab">2</div>
-  <div class="tab-pane fade" id="pills-Wednesday" role="tabpanel" aria-labelledby="pill-Wednesday-tab">3</div>
-  <div class="tab-pane fade" id="pills-Thursday" role="tabpanel" aria-labelledby="pill-Thursday-tab">4</div>
-  <div class="tab-pane fade" id="pills-Friday" role="tabpanel" aria-labelledby="pill-Friday-tab">5</div>
-  <div class="tab-pane fade" id="pills-Saturday" role="tabpanel" aria-labelledby="pill-Saturday-tab">6</div>
+  <div class="tab-pane fade show active" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab"><table>
+   <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col" id="time">№ Урока</th>
+        <th scope="col">Урок</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row" id="time">1(8:30)</th>
+        <td rowspan="2" style="vertical-align: middle;">Просыпаешься</td>
+      </tr>
+      <tr>
+        <th scope="row" id="time">2(9:15)</th>
+      </tr>
+      <tr>
+        <th scope="row" id="time">3(10:20)</th>
+        <td>Кушаешь</td>
+      </tr>
+      <tr>
+        <th scope="row" id="time">4(11:25)</th>
+        <td>Одеваешься</td>
+      </tr>
+      <tr>
+        <th scope="row" id="time">5(12:30)</th>
+        <td>Готовишься</td>
+      </tr>
+      <tr>
+        <th scope="row" id="time">6(13:25)</th>
+        <td>Приходишь</td>
+      </tr>
+    </tbody>
+  </table> 
+</table>
+</div>
+<div class="tab-pane fade" id="pills-Tuesday" role="tabpanel" aria-labelledby="pill-Tuesday-tab">2</div>
+<div class="tab-pane fade" id="pills-Wednesday" role="tabpanel" aria-labelledby="pill-Wednesday-tab">3</div>
+<div class="tab-pane fade" id="pills-Thursday" role="tabpanel" aria-labelledby="pill-Thursday-tab">4</div>
+<div class="tab-pane fade" id="pills-Friday" role="tabpanel" aria-labelledby="pill-Friday-tab">5</div>
+<div class="tab-pane fade" id="pills-Saturday" role="tabpanel" aria-labelledby="pill-Saturday-tab">6</div>
 </div>
 {% for element in table_data %}
 {{ element.class_number }}

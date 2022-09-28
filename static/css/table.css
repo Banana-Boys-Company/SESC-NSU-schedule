@@ -3,8 +3,16 @@
 	max-width: 30%;
 }
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
-	background-color: #198754!important;
+	background-color: #345d32!important;
 }
 .nav-link {
 	color: black!important;
+}
+table {
+	max-width: 96%;
+	margin-left: 2%;
+	margin-right: 2%;
+}
+#time {
+	width: 10%;
 }
