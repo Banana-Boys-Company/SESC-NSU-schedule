@@ -1,9 +1,11 @@
 #pills-tab{
 	padding-top: 10px;
 	max-width: 30%;
+	margin-left: 2%;
 }
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
 	background-color: #345d32!important;
+
 }
 .nav-link {
 	color: black!important;
