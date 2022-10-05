@@ -90,20 +90,13 @@ socket.on('schedule', data => {
     console.log(data)
     if (data["status"] === 200) {
         console.log("Connection success!")
-        data = {"monday": [['sksksk', 1], ['sksksk', 1], ['sksksk', 1], ['sksksk', 1], ['sksksk', 1], ['sksksk', 1]],
-        "tuesday": [['sksksk', 1], ["srgjmsrklgs'rk", 1], ['sksksk', 1], ['sksksk', 1], ['sksksk', 1], ['sksksk', 1]],
-        "wednesday": [['sksksk', 2], ['sksksk', 2], ['sksksk', 2]],
-        "thursday": [['sksksk', 1], ["srgjmsrklgs'rk", 1], ['sksksk', 1], ['sksksk', 1], ['sksksk', 1], ['sksksk', 1]],
-        "friday": [['sksksk', 1], ["srgjmsrklgs'rk", 1], ['sksksk', 1], ['sksksk', 1], ['sksksk', 1], ['sksksk', 1]],
-        "saturday": [['sksksk', 2], ['sksksk', 1], ['sksksk', 1], ['sksksk', 2]]
+        generate_schedule_table(data, weekDay_title, time_lst)
     }
-    generate_schedule_table(data, weekDay_title, time_lst)
-}
 })
 
 // Генерация расписания на основе данных с сервера
 function generate_schedule_table(data, weekDay_title, time_lst) {
-    $('#main-page').empty()
+    $('#main-page').empty() // отчистка места появления таблицы
     let start = `<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
     <li class="nav-item" role="presentation">
     <button class="nav-link active" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"
@@ -130,35 +123,30 @@ function generate_schedule_table(data, weekDay_title, time_lst) {
     type="button" role="tab" aria-controls="week-Saturday" aria-selected="false">Сб</button>
     </li>
     </ul>
-    <div class="tab-content" id="weeks-tabContent">`
-    counter = 0
+    <div class="tab-content" id="weeks-tabContent">`// 6 базовых кнопок в начале
     for (let i = 0; i <= 5; i++) {
-        start += weekDay_title[i]
-        start += '<table class="table table-bordered"><thead><tr><th scope="col" id="time">№ Урока</th><th scope="col">Урок</th></tr></thead><tbody>'
-        timer = 0
-        // bug spot
-        for (let element in data[Object.keys(data)[i]]) {            
-            let shablon = ""
-            shablon += `<tr><th scope="row" id="time">${time_lst[timer]}</th>`
+        start += weekDay_title[i] // добавление начала нужной вкладки из констант
+        start += '<table class="table table-bordered"><thead><tr><th scope="col" id="time">№ Урока</th><th scope="col">Урок</th></tr></thead><tbody>' //Первая строчка таблицы №Урока и Урок
+        timer = 0 // таймер для уроков(максимум 6)
+        for (let element in data[Object.keys(data)[i]]) {// циклом проходимся по каждому двумерному списку словаря используя ключи строго от monday к saturday            
+            let shablon = "" // в этом цикле создаем переменную шаблон для генерирования в ней самой таблицы каждого дня
+            shablon += `<tr><th scope="row" id="time">${time_lst[timer]}</th>`//прибавляем время
             timer += 1
-            console.log(data[Object.keys(data)[i]])
-            console.log(data[Object.keys(data)[i]][element])
-            if (data[Object.keys(data)[i]][element][1] > 1) {
-                shablon += `<td rowspan="${data[Object.keys(data)[i]][element][1]}" style="vertical-align: middle;">${data[Object.keys(data)[i]][element][0]}</td></tr>`
-                while (data[Object.keys(data)[i]][element][1] > 1){
+            if (data[Object.keys(data)[i]][element][1] > 1) { // если высота строки больше 1
+                shablon += `<td rowspan="${data[Object.keys(data)[i]][element][1]}" style="vertical-align: middle;">${data[Object.keys(data)[i]][element][0]}</td></tr>` // задаем эту строку нужной высоты и добавляем стиль вертикального центрирования
+                while (data[Object.keys(data)[i]][element][1] > 1){ // надо добавить h-1 пустых строк, чтобы таблица не сломалась(h - высота строки)
                     shablon += `<tr><th scope="row" id="time">${time_lst[timer]}</th></tr>`
-                    timer += 1
-                    data[Object.keys(data)[i]][element][1] -= 1}
+                    timer += 1 // В первом столбце всегда будет 6 рядов, поэтому каждый раз генерим новую строку для 1 столбца и увеличиваем таймер
+                    data[Object.keys(data)[i]][element][1] -= 1} // уменьшаем высоту уже выбранной строки, чтобы цикл не зациклился
                 }
-                else {
+                else { // длинна строки может быть только 1, значит добавляем к шаблону f-строку с заданной высотой
                     shablon += `<td rowspan="1">${data[Object.keys(data)[i]][element][0]}</td></tr>`
                 }
-                start += shablon
+                start += shablon // в конце прибавляем к start сморфированную таблицу
             }
-            start += "</tbody></table></div>"
+            start += "</tbody></table></div>" // закрываем все теги
         }
-        // end bug
-        start += "</div>"
-        $('#main-page').append(start)
+        start += "</div>" // закрываем последний тег
+        $('#main-page').append(start) //добавляем таблицу на страничку
 
     }
