@@ -4,8 +4,8 @@ import re
 from openpyxl.cell.cell import Cell
 from json import dumps, dump
 import copy
-from parser.common import pattern, dow2dow, subj, validate_str, bug_rows, get_merged_cell_val
-from common import pattern, dow2dow, subj, validate_str, bug_rows, get_merged_cell_val
+from parser.common import pattern, dow2dow, subj, validate_str, bug_rows, get_merged_cell_val, full_subj_name
+# from common import pattern, dow2dow, subj, validate_str, bug_rows, get_merged_cell_val, full_subj_name
 from typing import IO
 from os.path import exists
 import io
@@ -93,6 +93,10 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
                 # Get actual day of week
                 day = row_to_day_of_the_week[cell.row]
 
+                _val = str(val).rstrip('.').upper()
+                if _val in subj:
+                    val = full_subj_name[_val]
+
                 if row == 0:
                     __dict[day] += [[val, rowlen]]
                 # Check if new day has come
@@ -100,7 +104,7 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
                     __dict[day] += [[val, rowlen]]
                 else:
                     # Checking if this row value is the same as the previous one (multiple rows for one lesson)
-                    if val in __dict[day][-1][0] and val not in subj:
+                    if val in __dict[day][-1][0] and _val not in subj:
                         __dict[day][-1][1] += rowlen
                     else:
                         # Checking if there`s two separates rows with different values for one lesson
@@ -110,7 +114,7 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
                         else:
                             __dict[day] += [[val, rowlen]]
                 # Cheking if this row was the first part of multiple rows for one lesson
-                same_lesson = str(val).rstrip('.').upper() in subj
+                same_lesson = _val in subj
                 previous_day = day
 
             # Divide every lesson length (in rows) to get actual length of lesson
