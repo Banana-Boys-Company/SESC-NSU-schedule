@@ -35,13 +35,15 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
     for i, column in enumerate(ws.iter_cols(max_row=2)):
         __v = str(get_merged_cell_val(ws, column[0]))
         __val = validate_str(get_merged_cell_val(ws, column[1]))
+        if len(__val) < 3:
+            __val = '0' * (3 - len(__val)) + __val
         if not re.match(r'\d+_\d+', __v):
             continue
         classes.setdefault(__v, dict())
         classes[__v].setdefault(__val, dict())
 
     # They`re not needed anymore
-    del __v, i
+    del __v, i, __val, column
 
     # Starting parsing data
     for i, column in enumerate(ws.iter_cols(min_row=1, max_row=75)):
@@ -74,6 +76,9 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
             # Getting class and group id
             class_num = validate_str(get_merged_cell_val(ws, column[0]))
             group_num = validate_str(get_merged_cell_val(ws, column[1]))
+
+            if len(group_num) < 3:
+                group_num = '0'*(3 - len(group_num)) + group_num
 
             # Looking through every cell
             for row, cell in enumerate(column[2:]):
@@ -114,7 +119,7 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
                         else:
                             __dict[day] += [[val, rowlen]]
                 # Cheking if this row was the first part of multiple rows for one lesson
-                same_lesson = str(val).rstrip('.').upper() in subj
+                same_lesson = str(_val).strip('.').upper() in subj
                 previous_day = day
 
             # Divide every lesson length (in rows) to get actual length of lesson

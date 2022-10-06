@@ -43,7 +43,7 @@ bug_rows = [22, 34, 37, 67]
 
 
 def validate_str(__s):
-    return str(__s).rstrip('_').replace('.0', '')
+    return str(__s).strip('_').replace('.0', '').rstrip('_')
 
 
 def get_merged_cell_val(sheet, __cell):
