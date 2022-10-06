@@ -1,23 +1,54 @@
 /*стили для логотипа*/
 .lgbt {
-    margin-left: 2px;
-    margin-right: 5%;
-    max-width: 100px;
-    height: auto;   
+   margin-left: 2px;
+   margin-right: 5%;
+   max-width: 100px;
+   height: auto;
 }
+
 img {
    pointer-events: none;
 }
+
 /*стили для dropdown*/
 .dropdown-menu .dropdown-menu {
    top: auto;
    left: 100%;
    transform: translateY(-5rem);
 }
-.dropdown-item + .dropdown-menu {
+
+.dropdown-item+.dropdown-menu {
    display: none;
 }
-.dropdown-item:hover + .dropdown-menu,
+
+.dropdown-item:hover+.dropdown-menu,
 .dropdown-menu:hover {
    display: block;
+}
+
+#footer {
+   visibility: visible;
+}
+
+#container-banner {
+   width: auto;
+   max-width: 680px;
+   padding: 0 15px;
+}
+
+.carousel {
+   height: 500px !important;
+}
+
+.carousel-inner img {
+   height: 400px !important;
+   margin: 0 auto;
+}
+
+.carousel-indicators li {
+   border-color: #000;
+}
+
+.carousel-indicators .active {
+   background-color: #000;
 }

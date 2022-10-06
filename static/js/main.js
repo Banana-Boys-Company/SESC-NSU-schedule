@@ -8,6 +8,39 @@ var timer = setTimeout(function () {
     location.reload();
 }, 300000)
 
+function banner_timer() {
+    var timer = setTimeout(function () {
+        socket.emit('request-banner')
+        console.log('banner-requested')
+        banner_timer();
+    }, 6000)
+}
+
+socket.on('response-banner', data => {
+    console.log(data)
+    let banner_links = []
+    Array.from($('.banner-element')).forEach(function (el) {
+        banner_links.push(el.children[0].getAttribute('src').replace("/static/", ""));
+    });
+    console.log(banner_links)
+    let is_same = (data['new_data'].length == banner_links.length) && data['new_data'].every(function (element, index) {
+        return element === banner_links[index];
+    });
+    if (data['old_data'] != []) {
+        let old_banners = []
+        Array.from($('.banner-element')).forEach(function (el) {
+            let this_src = el.children[0].getAttribute('src').replace("/static/", "");
+            if (data['old_data'].includes(this_src)) {
+                el.parentNode.removeChild(el);
+            }
+        });
+    }
+    let difference = data['new_data'].filter(x => !banner_links.includes(x));
+    difference.forEach(function (item, i, difference) {
+        $("#carousel").append(`<div class="carousel-item banner-element"><img src="${item}" class="d-block w-100" alt="Баннер"></div>`)
+    });
+})
+
 // Тестовый запрос к серверу
 socket.on('connect', () => {
     socket.send({ 'status': 200 })
@@ -26,8 +59,13 @@ let weekDay_title = [
 
 // Код после полной загрузки страницы
 $(document).ready(function () {
+    banner_timer();
     // Выбор группы класса
+
     $('.get-table').on("click", function (el) {
+
+        $('#footer').css({ 'visibility': 'hidden', 'display': 'none' })
+
         $(".child-window-menu-1").hide();
         $(".child-window-menu-2").hide();
         $(".child-window-menu-3").hide();
@@ -88,6 +126,11 @@ socket.on('schedule', data => {
         console.log("Connection success!")
         generate_schedule_table(data, weekDay_title, time_lst)
     }
+})
+
+socket.on('banner_update', data => {
+    console.log("something")
+    console.log(data)
 })
 
 // Генерация расписания на основе данных с сервера
