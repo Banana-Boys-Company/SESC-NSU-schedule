@@ -114,7 +114,7 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
                         else:
                             __dict[day] += [[val, rowlen]]
                 # Cheking if this row was the first part of multiple rows for one lesson
-                same_lesson = _val in subj
+                same_lesson = str(val).rstrip('.').upper() in subj
                 previous_day = day
 
             # Divide every lesson length (in rows) to get actual length of lesson
