@@ -16,12 +16,12 @@ socket.on('connect', () => {
 let time_lst = ["1(8:30)", "2(9:15)", "3(10:20)", "4(11:25)", "5(12:30)", "6(13:25)"]
 
 let weekDay_title = [
-'    <div class="tab-pane fade show active" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab">',
-'    <div class="tab-pane fade" id="pills-Tuesday" role="tabpanel" aria-labelledby="pill-Tuesday-tab">',
-'    <div class="tab-pane fade" id="pills-Wednesday" role="tabpanel" aria-labelledby="pill-Wednesday-tab">',
-'    <div class="tab-pane fade" id="pills-Thursday" role="tabpanel" aria-labelledby="pill-Thursday-tab">',
-'    <div class="tab-pane fade" id="pills-Friday" role="tabpanel" aria-labelledby="pill-Friday-tab">',
-'    <div class="tab-pane fade" id="pills-Saturday" role="tabpanel" aria-labelledby="pill-Saturday-tab">'
+    '    <div class="tab-pane fade show active" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab">',
+    '    <div class="tab-pane fade" id="pills-Tuesday" role="tabpanel" aria-labelledby="pill-Tuesday-tab">',
+    '    <div class="tab-pane fade" id="pills-Wednesday" role="tabpanel" aria-labelledby="pill-Wednesday-tab">',
+    '    <div class="tab-pane fade" id="pills-Thursday" role="tabpanel" aria-labelledby="pill-Thursday-tab">',
+    '    <div class="tab-pane fade" id="pills-Friday" role="tabpanel" aria-labelledby="pill-Friday-tab">',
+    '    <div class="tab-pane fade" id="pills-Saturday" role="tabpanel" aria-labelledby="pill-Saturday-tab">'
 ]
 
 // Код после полной загрузки страницы
@@ -29,16 +29,12 @@ $(document).ready(function () {
     // Выбор группы класса
     $('.get-table').on("click", function (el) {
         $(".child-window-menu-1").hide();
-        $(".child-window-menu-2").hide(); 
-        $(".child-window-menu-3").hide(); 
+        $(".child-window-menu-2").hide();
+        $(".child-window-menu-3").hide();
 
         console.log("Send data")
         socket.emit('getClassData', { 'item_id': el.target.id });
     });
-
-
-    // Изменение цвета ссылок
-
 
     // Нажатие на дочерние меню 9 класса
 
@@ -47,7 +43,7 @@ $(document).ready(function () {
     let toggle_2 = 0;
     let toggle_3 = 0;
     $(".child-toggle-1").on("click", function () {
-        if (toggle_1>= 1) {
+        if (toggle_1 >= 1) {
             $(".child-window-menu-1").toggle();
             $(".child-window-menu-2").hide();
             $(".child-window-menu-3").hide();
@@ -134,19 +130,20 @@ function generate_schedule_table(data, weekDay_title, time_lst) {
             timer += 1
             if (data[Object.keys(data)[i]][element][1] > 1) { // если высота строки больше 1
                 shablon += `<td rowspan="${data[Object.keys(data)[i]][element][1]}" style="vertical-align: middle;">${data[Object.keys(data)[i]][element][0]}</td></tr>` // задаем эту строку нужной высоты и добавляем стиль вертикального центрирования
-                while (data[Object.keys(data)[i]][element][1] > 1){ // надо добавить h-1 пустых строк, чтобы таблица не сломалась(h - высота строки)
+                while (data[Object.keys(data)[i]][element][1] > 1) { // надо добавить h-1 пустых строк, чтобы таблица не сломалась(h - высота строки)
                     shablon += `<tr><th scope="row" id="time">${time_lst[timer]}</th></tr>`
                     timer += 1 // В первом столбце всегда будет 6 рядов, поэтому каждый раз генерим новую строку для 1 столбца и увеличиваем таймер
-                    data[Object.keys(data)[i]][element][1] -= 1} // уменьшаем высоту уже выбранной строки, чтобы цикл не зациклился
-                }
-                else { // длинна строки может быть только 1, значит добавляем к шаблону f-строку с заданной высотой
-                    shablon += `<td rowspan="1">${data[Object.keys(data)[i]][element][0]}</td></tr>`
-                }
-                start += shablon // в конце прибавляем к start сморфированную таблицу
+                    data[Object.keys(data)[i]][element][1] -= 1
+                } // уменьшаем высоту уже выбранной строки, чтобы цикл не зациклился
             }
-            start += "</tbody></table></div>" // закрываем все теги
+            else { // длинна строки может быть только 1, значит добавляем к шаблону f-строку с заданной высотой
+                shablon += `<td rowspan="1">${data[Object.keys(data)[i]][element][0]}</td></tr>`
+            }
+            start += shablon // в конце прибавляем к start сморфированную таблицу
         }
-        start += "</div>" // закрываем последний тег
-        $('#main-page').append(start) //добавляем таблицу на страничку
-
+        start += "</tbody></table></div>" // закрываем все теги
     }
+    start += "</div>" // закрываем последний тег
+    $('#main-page').append(start) //добавляем таблицу на страничку
+
+}

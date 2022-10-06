@@ -1,32 +1,53 @@
 from flask import Flask, render_template, url_for
 from flask_socketio import SocketIO, emit
+from apscheduler.schedulers.background import BackgroundScheduler
+import parser.parser as parser
+import urllib.request
+import json
+import os.path
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = '&85e8hE1%J2&eH(D*E8i2v)5DoquH*)D'
-
 socketio = SocketIO(app)
+URL = "https://docs.google.com/spreadsheets/u/1/d/e/2PACX-1vQdS9Qd6cdKjcvTefM_PaaODSfpkpk55Zl2g4QxBVpKkUJsU1U08wKXdi6cSkNBAQ/pub?output=xlsx"
 
 
-class Classes_data:
-    def __init__(self, class_ids: list = None):
-        self.class_ids = class_ids
+if os.path.exists("data.json"):
+    with open('data.json') as f:
+        cashed_data = json.load(f)
+else:
+    if os.path.exists("data.xlsx"):
+        cashed_data = parser.parse_schedule(
+            'data.xlsx', 'Расписание_1 сем')
+    else:
+        try:
+            urllib.request.urlretrieve(URL, "data.xlsx")
+        except Exception:
+            print(Exception)
+        else:
+            cashed_data = parser.parse_schedule(
+                'data.xlsx', 'Расписание_1 сем')
 
 
-class Class_info(Classes_data):
-    def __init__(self, class_number: str = None, group_number=None):
-        self.class_number = class_number
-        self.group_number = group_number
-        if class_number is not None:
-            self.status = 200
+def update_schedule_json_data():
+    print("Start updating data...")
+    global cashed_data
+    try:
+        urllib.request.urlretrieve(URL, "data.xlsx")
+    except Exception:
+        print("Downloading error, trying to open json data...")
+        with open('data.json') as f:
+            cashed_data = json.load(f)
+        print("JSON data was loaded!")
+    else:
+        cashed_data = parser.parse_schedule(
+            'data.xlsx', 'Расписание_1 сем')
+    print("Data updated!")
 
 
-global_data = Classes_data(["9-1", "9-2", "10-1", "10-2", "10-3", "10-4", "10-5", "10-6", "10-7", "10-8", "11-1", "11-2", "11-3", "11-4", "11-5", "11-6", "11-7", "11-8", "11-9", "11-10", "11-11", "11-12"])
-
-
-def get_class_info(item_id: str):
-    data = Class_info(item_id.split(":")[0], item_id.split(":")[-1])
-    return {"class_number": data.class_number, "status": data.status}
+scheduler = BackgroundScheduler()
+job = scheduler.add_job(update_schedule_json_data, 'interval', minutes=30)
 
 
 @socketio.on("connect")
@@ -37,13 +58,13 @@ def getConnection(data):
 @socketio.on("getClassData")
 def responseData(data):
     print("response-data")
-
+    print(data)
     if (isinstance(data, dict)) and ('item_id' in data.keys()):
-        print(data)
-        if data['item_id'].split(":")[0] in global_data.class_ids:
-            print(get_class_info(data['item_id']))
-            emit('schedule', get_class_info(data['item_id']))
-            return
+        requested_data = data["item_id"].split(":")
+        cashed_data[requested_data[0]][requested_data[1]].update({
+                                                                 "status": 200})
+        emit('schedule', cashed_data[requested_data[0]][requested_data[1]])
+        return
     return url_for("index")
 
 
@@ -53,4 +74,5 @@ def index():
 
 
 if __name__ == '__main__':
+    scheduler.start()
     socketio.run(app, port=80, host="127.0.0.1", debug=True)

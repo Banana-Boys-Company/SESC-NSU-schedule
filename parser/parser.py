@@ -1,9 +1,9 @@
 import openpyxl as xl
 import re
 from openpyxl.cell.cell import Cell
-from json import dumps
+import json
 import copy
-from common import pattern, dow2dow, subj, validate_str, bug_rows, get_merged_cell_val
+from parser.common import pattern, dow2dow, subj, validate_str, bug_rows, get_merged_cell_val
 
 
 def parse_schedule(table_name: str, sheet_name):
@@ -41,7 +41,8 @@ def parse_schedule(table_name: str, sheet_name):
                         continue
                 if value is None:
                     row_to_day_of_the_week: dict
-                    value = row_to_day_of_the_week[list(row_to_day_of_the_week)[-1]]
+                    value = row_to_day_of_the_week[list(
+                        row_to_day_of_the_week)[-1]]
                     row_to_day_of_the_week[cell_.row] = value
                     continue
                 row_to_day_of_the_week[cell_.row] = dow2dow[value]
@@ -112,11 +113,8 @@ def parse_schedule(table_name: str, sheet_name):
                 for lesson in day:
                     lesson[1] //= 2
 
-    # Returning json with unicode characters
-    return dumps(classes, ensure_ascii=False)
+    # Save data to data.json file
 
-
-if __name__ == '__main__':
-    with open('json.json', 'w', encoding='utf8') as file:
-        json = parse_schedule('SESC_Timetable 2022_2023.xlsx', 'Расписание_1 сем')
-        file.write(json)
+    with open('data.json', 'w') as f:
+        json.dump(classes, f, ensure_ascii=False)
+    return json.dumps(classes, ensure_ascii=False)
