@@ -5,7 +5,7 @@ pattern = {
     'thursday': [],
     'friday': [],
     'saturday': []
-}
+    }
 
 dow2dow = {
     'Понедельник': 'monday',
@@ -14,7 +14,7 @@ dow2dow = {
     'Четверг': 'thursday',
     'Пятница': 'friday',
     'Суббота': 'saturday'
-}
+    }
 
 subj = [
     'МАТ', 'ЛИТ', 'ГЕО',
@@ -34,10 +34,3 @@ def validate_str(__s):
 def get_merged_cell_val(sheet, __cell):
     rng = [s for s in sheet.merged_cells.ranges if __cell.coordinate in s]
     return sheet.cell(rng[0].min_row, rng[0].min_col).value if len(rng) != 0 else __cell.value
-
-
-# def int_to_excel_col(a: int):
-#     a += 64
-#     if a > 90:
-#         return 'A' + chr(a - 26)
-#     return chr(a)

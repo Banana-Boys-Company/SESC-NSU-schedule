@@ -1,15 +1,27 @@
 import openpyxl as xl
+from openpyxl.utils.exceptions import SheetTitleException
 import re
 from openpyxl.cell.cell import Cell
-import json
+from json import dumps, dump
 import copy
 from parser.common import pattern, dow2dow, subj, validate_str, bug_rows, get_merged_cell_val
+from common import pattern, dow2dow, subj, validate_str, bug_rows, get_merged_cell_val
+from typing import IO
+from os.path import exists
+import io
 
-
-def parse_schedule(table_name: str, sheet_name):
+def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
     # Loading xlsx file
-    wb = xl.load_workbook(table_name)
-    ws = wb[sheet_name]
+    if exists(table_path):
+        wb: xl.Workbook = xl.load_workbook(table_path)
+    else:
+        raise FileNotFoundError('File does not exist')
+    if sheet_name in wb.sheetnames:
+        ws = wb[sheet_name]
+    else:
+        raise SheetTitleException('Sheet with this name does not exist')
+    if not re.match(r'[+w]t?', fp.mode):
+        raise io.UnsupportedOperation('File is not writable')
 
     # Initiating variables
     classes = dict()
@@ -41,8 +53,7 @@ def parse_schedule(table_name: str, sheet_name):
                         continue
                 if value is None:
                     row_to_day_of_the_week: dict
-                    value = row_to_day_of_the_week[list(
-                        row_to_day_of_the_week)[-1]]
+                    value = row_to_day_of_the_week[list(row_to_day_of_the_week)[-1]]
                     row_to_day_of_the_week[cell_.row] = value
                     continue
                 row_to_day_of_the_week[cell_.row] = dow2dow[value]
@@ -100,21 +111,23 @@ def parse_schedule(table_name: str, sheet_name):
                 # Cheking if this row was the first part of multiple rows for one lesson
                 same_lesson = str(val).rstrip('.').upper() in subj
                 previous_day = day
+
+            # Divide every lesson length (in rows) to get actual length of lesson
+            for __day in __dict:
+                _day = __dict[__day]
+                for __lesson in _day:
+                    __lesson[1] //= 2
+
             # Writing data in main dictionary
             classes[class_num][group_num] = __dict
 
-    # Divide every lesson length (in rows) to get actual length of lesson
-    for _cl in classes:
-        cl = classes[_cl]
-        for _gr in cl:
-            group = cl[_gr]
-            for _d in group:
-                day = group[_d]
-                for lesson in day:
-                    lesson[1] //= 2
 
-    # Save data to data.json file
+    # Returning json with unicode characters
+    if fp:
+        dump(classes, fp=fp, ensure_ascii=False)
+    return dumps(classes, ensure_ascii=False)
 
-    with open('data.json', 'w') as f:
-        json.dump(classes, f, ensure_ascii=False)
-    return json.dumps(classes, ensure_ascii=False)
+
+if __name__ == '__main__':
+    with open('json.json', 'w', encoding='utf8') as file:
+        json = parse_schedule('SESC_Timetable 2022_2023.xlsx', 'Расписание_1 сем', fp=file)
