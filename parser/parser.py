@@ -5,7 +5,7 @@ from openpyxl.cell.cell import Cell
 from json import dumps, dump
 import copy
 from parser.common import pattern, dow2dow, subj, validate_str, bug_rows, get_merged_cell_val
-from common import pattern, dow2dow, subj, validate_str, bug_rows, get_merged_cell_val
+from parser.common import pattern, dow2dow, subj, validate_str, bug_rows, get_merged_cell_val
 from typing import IO
 from os.path import exists
 import io
@@ -54,7 +54,8 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
                         continue
                 if value is None:
                     row_to_day_of_the_week: dict
-                    value = row_to_day_of_the_week[list(row_to_day_of_the_week)[-1]]
+                    value = row_to_day_of_the_week[list(
+                        row_to_day_of_the_week)[-1]]
                     row_to_day_of_the_week[cell_.row] = value
                     continue
                 row_to_day_of_the_week[cell_.row] = dow2dow[value]
@@ -100,7 +101,7 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
                     __dict[day] += [[val, rowlen]]
                 else:
                     # Checking if this row value is the same as the previous one (multiple rows for one lesson)
-                    if val in __dict[day][-1][0] and val not in subj:
+                    if (val in __dict[day][-1][0]) and (val not in subj):
                         __dict[day][-1][1] += rowlen
                     else:
                         # Checking if there`s two separates rows with different values for one lesson
@@ -124,10 +125,11 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
 
     # Returning json with unicode characters
     if fp:
-        dump(classes, fp=fp, ensure_ascii=False)
+        dump(classes, fp=fp, ensure_ascii=False, )
     return dumps(classes, ensure_ascii=False)
 
 
 if __name__ == '__main__':
     with open('json.json', 'w', encoding='utf8') as file:
-        json = parse_schedule('SESC_Timetable 2022_2023.xlsx', 'Расписание_1 сем', fp=file)
+        json = parse_schedule(
+            'SESC_Timetable 2022_2023.xlsx', 'Расписание_1 сем', fp=file)

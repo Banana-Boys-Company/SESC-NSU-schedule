@@ -18,16 +18,18 @@ if os.path.exists("data.json"):
         cashed_data = json.load(f)
 else:
     if os.path.exists("data.xlsx"):
-        cashed_data = parser.parse_schedule(
-            'data.xlsx', 'Расписание_1 сем')
+        with open("data.json", "w") as f:
+            cashed_data = parser.parse_schedule(
+                'data.xlsx', 'Расписание_1 сем', fp=f)
     else:
         try:
             urllib.request.urlretrieve(URL, "data.xlsx")
         except Exception:
             print(Exception)
         else:
-            cashed_data = parser.parse_schedule(
-                'data.xlsx', 'Расписание_1 сем')
+            with open("data.json", "w") as f:
+                cashed_data = parser.parse_schedule(
+                    'data.xlsx', 'Расписание_1 сем', fp=f)
 
 
 def update_schedule_json_data():
@@ -41,8 +43,9 @@ def update_schedule_json_data():
             cashed_data = json.load(f)
         print("JSON data was loaded!")
     else:
-        cashed_data = parser.parse_schedule(
-            'data.xlsx', 'Расписание_1 сем')
+        with open("data.json", "w") as f:
+            cashed_data = parser.parse_schedule(
+                'data.xlsx', 'Расписание_1 сем', fp=f)
     print("Data updated!")
 
 
