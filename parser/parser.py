@@ -4,8 +4,8 @@ import re
 from openpyxl.cell.cell import Cell
 from json import dumps, dump
 import copy
-from parser.common import pattern, dow2dow, subj, validate_str, bug_rows, get_merged_cell_val
-from parser.common import pattern, dow2dow, subj, validate_str, bug_rows, get_merged_cell_val
+from parser.common import pattern, dow2dow, subj, validate_str, bug_rows, get_merged_cell_val, full_subj_name
+# from common import pattern, dow2dow, subj, validate_str, bug_rows, get_merged_cell_val, full_subj_name
 from typing import IO
 from os.path import exists
 import io
@@ -35,13 +35,15 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
     for i, column in enumerate(ws.iter_cols(max_row=2)):
         __v = str(get_merged_cell_val(ws, column[0]))
         __val = validate_str(get_merged_cell_val(ws, column[1]))
+        if len(__val) < 3:
+            __val = '0' * (3 - len(__val)) + __val
         if not re.match(r'\d+_\d+', __v):
             continue
         classes.setdefault(__v, dict())
         classes[__v].setdefault(__val, dict())
 
     # They`re not needed anymore
-    del __v, i
+    del __v, i, __val, column
 
     # Starting parsing data
     for i, column in enumerate(ws.iter_cols(min_row=1, max_row=75)):
@@ -54,8 +56,7 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
                         continue
                 if value is None:
                     row_to_day_of_the_week: dict
-                    value = row_to_day_of_the_week[list(
-                        row_to_day_of_the_week)[-1]]
+                    value = row_to_day_of_the_week[list(row_to_day_of_the_week)[-1]]
                     row_to_day_of_the_week[cell_.row] = value
                     continue
                 row_to_day_of_the_week[cell_.row] = dow2dow[value]
@@ -76,6 +77,9 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
             class_num = validate_str(get_merged_cell_val(ws, column[0]))
             group_num = validate_str(get_merged_cell_val(ws, column[1]))
 
+            if len(group_num) < 3:
+                group_num = '0'*(3 - len(group_num)) + group_num
+
             # Looking through every cell
             for row, cell in enumerate(column[2:]):
                 # Getting value of cell
@@ -94,6 +98,10 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
                 # Get actual day of week
                 day = row_to_day_of_the_week[cell.row]
 
+                _val = str(val).rstrip('.').upper()
+                if _val in subj:
+                    val = full_subj_name[_val]
+
                 if row == 0:
                     __dict[day] += [[val, rowlen]]
                 # Check if new day has come
@@ -101,7 +109,7 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
                     __dict[day] += [[val, rowlen]]
                 else:
                     # Checking if this row value is the same as the previous one (multiple rows for one lesson)
-                    if (val in __dict[day][-1][0]) and (val not in subj):
+                    if val in __dict[day][-1][0] and _val not in subj:
                         __dict[day][-1][1] += rowlen
                     else:
                         # Checking if there`s two separates rows with different values for one lesson
@@ -111,7 +119,7 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
                         else:
                             __dict[day] += [[val, rowlen]]
                 # Cheking if this row was the first part of multiple rows for one lesson
-                same_lesson = str(val).rstrip('.').upper() in subj
+                same_lesson = str(_val).strip('.').upper() in subj
                 previous_day = day
 
             # Divide every lesson length (in rows) to get actual length of lesson
@@ -125,11 +133,10 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
 
     # Returning json with unicode characters
     if fp:
-        dump(classes, fp=fp, ensure_ascii=False, )
+        dump(classes, fp=fp, ensure_ascii=False)
     return dumps(classes, ensure_ascii=False)
 
 
 if __name__ == '__main__':
     with open('json.json', 'w', encoding='utf8') as file:
-        json = parse_schedule(
-            'SESC_Timetable 2022_2023.xlsx', 'Расписание_1 сем', fp=file)
+        json = parse_schedule('SESC_Timetable 2022_2023.xlsx', 'Расписание_1 сем', fp=file)
