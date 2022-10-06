@@ -10,6 +10,7 @@ from typing import IO
 from os.path import exists
 import io
 
+
 def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
     # Loading xlsx file
     if exists(table_path):
@@ -99,7 +100,7 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
                     __dict[day] += [[val, rowlen]]
                 else:
                     # Checking if this row value is the same as the previous one (multiple rows for one lesson)
-                    if val in __dict[day][-1][0]:
+                    if val in __dict[day][-1][0] and val not in subj:
                         __dict[day][-1][1] += rowlen
                     else:
                         # Checking if there`s two separates rows with different values for one lesson
@@ -120,7 +121,6 @@ def parse_schedule(table_path: str, sheet_name: str, fp: IO[str] = None):
 
             # Writing data in main dictionary
             classes[class_num][group_num] = __dict
-
 
     # Returning json with unicode characters
     if fp:
