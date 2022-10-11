@@ -1,3 +1,5 @@
+import copy
+
 pattern = {
     'monday': [],
     'tuesday': [],
@@ -67,3 +69,12 @@ def validate_str(__s):
 def get_merged_cell_val(sheet, __cell):
     rng = [s for s in sheet.merged_cells.ranges if __cell.coordinate in s]
     return sheet.cell(rng[0].min_row, rng[0].min_col).value if len(rng) != 0 else __cell.value
+
+
+def merge_dicts(_d1: dict, _d2: dict):
+    d1 = copy.deepcopy(_d1)
+    d2 = copy.deepcopy(_d2)
+    for _class in d1:
+        for _group in d1[_class]:
+            for _day in d1[_class][_group]:
+                d1[_class][_group][_day].extend(d2[_class][_group][_day])
