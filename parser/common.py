@@ -19,7 +19,7 @@ dow2dow = {
 subj = [
     'МАТ', 'ЛИТ', 'ГЕО', 'ИСТ',
     'ХИМ', 'РУС. ЯЗ', 'ИСТОРИЯ', 'ОБЖ',
-    'ИНФ', 'ФИЗ', 'ОБЩ', 'МАТ Л', 'БИО'
+    'ИНФ', 'ФИЗ', 'ОБЩ', 'МАТ Л', 'БИО', 'ФИЗ Л'
     ]
 
 full_subj_name = {
@@ -36,10 +36,28 @@ full_subj_name = {
     'ИНФ': 'Информатика',
     'ФИЗ': 'Физика',
     'ОБЩ': 'Обществознание',
-    'МАТ Л': 'Лекция по математике'
+    'МАТ Л': 'Лекция по математике',
+    'ФИЗ Л': 'Лекция по физике'
     }
 
-bug_rows = [22, 34, 37, 67]
+
+class ScheduleProperties:
+    bug_rows: list[int]
+    useless_columns: list[int]
+    useless_rows: list[int]
+    last_row: list[int]
+    second_time: bool
+
+    def __init__(self, _bug_rows, _useless_columns, _useless_rows, _last_row, _second_time):
+        self.bug_rows = _bug_rows
+        self.useless_columns = _useless_columns
+        self.useless_rows = _useless_rows
+        self.last_row = _last_row
+        self.second_time = _second_time
+
+
+first_table_properties = ScheduleProperties([22, 34, 37, 67], [1, 24, 41], [15, 27, 38, 51, 64, 76], 75, True)
+second_table_properties = ScheduleProperties([], [1, 23, 40], [17, 18, 33, 34, 49, 50, 65, 66, 81, 82], 96, False)
 
 
 def validate_str(__s):
