@@ -4,16 +4,16 @@
 const socket = io.connect("http://127.0.0.1:80")
 
 // Таймер неактивности, поистечению 5 минут перезагрузка
-var timer = setTimeout(function () {
+var timer_ = setTimeout(function () {
     location.reload();
-}, 300000)
+}, 10000)
 
 function banner_timer() {
-    var timer = setTimeout(function () {
+    var timer_new = setTimeout(function () {
         socket.emit('request-banner')
         console.log('banner-requested')
         banner_timer();
-    }, 6000)
+    }, 10000)
 }
 
 socket.on('response-banner', data => {
@@ -24,8 +24,12 @@ socket.on('response-banner', data => {
     });
     console.log(banner_links)
     let is_same = (data['new_data'].length == banner_links.length) && data['new_data'].every(function (element, index) {
+        console.log(element)
+        console.log(banner_links[index])
+
         return element === banner_links[index];
     });
+    console.log(is_same)
     if (data['old_data'] != []) {
         let old_banners = []
         Array.from($('.banner-element')).forEach(function (el) {
@@ -37,7 +41,7 @@ socket.on('response-banner', data => {
     }
     let difference = data['new_data'].filter(x => !banner_links.includes(x));
     difference.forEach(function (item, i, difference) {
-        $("#carousel").append(`<div class="carousel-item banner-element"><img src="${item}" class="d-block w-100" alt="Баннер"></div>`)
+        $("#carousel").append(`<div class="carousel-item banner-element"><img src="/static/${item}" class="d-block w-100" alt="Баннер"></div>`)
     });
 })
 
@@ -112,10 +116,10 @@ $(document).ready(function () {
 
     // Перезапуск таймера при активности
     $('html').click(function () {
-        clearTimeout(timer);
-        timer = setTimeout(function () {
+        clearTimeout(timer_);
+        timer_ = setTimeout(function () {
             location.reload();
-        }, 300000)
+        }, 10000)
     });
 });
 

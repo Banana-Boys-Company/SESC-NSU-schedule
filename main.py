@@ -5,6 +5,7 @@ import parser.parser as parser
 import urllib.request
 import json
 import os.path
+import urllib.parse
 # import eventlet
 import shutil
 
@@ -34,9 +35,14 @@ else:
             with open("data.json", "w") as f:
                 cashed_data = parser.parse_schedule(
                     'data.xlsx', 'Расписание_1 сем', fp=f)
-BANNER_DATA = {"new_data": [f"images/banner/{element}" for element in os.listdir(
-    "\\\\WHITEEVILBRO-LA\Share")], "old_data": [], "filenames": os.listdir(
-    "\\\\WHITEEVILBRO-LA\Share")}
+try:
+    BANNER_DATA = {"new_data": [f"images/banner/{element}" for element in os.listdir(
+        "\\\\WHITEEVILBRO-LA\Share")], "old_data": [], "filenames": os.listdir(
+        "\\\\WHITEEVILBRO-LA\Share")}
+except FileNotFoundError:
+    BANNER_DATA = {"new_data": [f"images/banner/{element}" for element in os.listdir(
+        "static\\images\\banner\\")], "old_data": [], "filenames": os.listdir(
+        "static\\images\\banner\\")}
 
 
 for item in BANNER_DATA["new_data"]:
@@ -47,7 +53,13 @@ for item in BANNER_DATA["new_data"]:
 
 
 def update_banner_data():
-    files = os.listdir("\\\\WHITEEVILBRO-LA\Share")
+    is_online = None
+    try:
+        files = os.listdir("\\\\WHITEEVILBRO-LA\Share")
+        is_online = True
+    except FileNotFoundError:
+        files = os.listdir(f"{os.getcwd()}\\static\\images\\banner")
+        is_online = False
     files = [f"images/banner/{element}" for element in files]
     for file in BANNER_DATA["new_data"]:
         if file not in files:
@@ -55,39 +67,14 @@ def update_banner_data():
                 BANNER_DATA["old_data"].append(files)
             os.remove("{}\\static\\{}".format(
                 os.getcwd(), file.replace("/", "\\")))
-    for file in files:
-        if file not in BANNER_DATA["new_data"]:
-            filename = file.split("/")[-1]
-            if filename not in os.listdir(f"{os.getcwd()}\\static\\images\\banner"):
-                a = shutil.copyfile(
-                    f"//WHITEEVILBRO-LA/Share/{filename}", "{}\\static\\{}".format(os.getcwd(), file.replace("/", "\\")))
+    if is_online is True:
+        for file in files:
+            if file not in BANNER_DATA["new_data"]:
+                filename = file.split("/")[-1]
+                if filename not in os.listdir(f"{os.getcwd()}\\static\\images\\banner"):
+                    a = shutil.copyfile(
+                        f"//WHITEEVILBRO-LA/Share/{filename}", "{}\\static\\{}".format(os.getcwd(), file.replace("/", "\\")))
     BANNER_DATA["new_data"] = files
-    # BANNER_DATA_old = set(BANNER_DATA["new_data"])
-    # for i in range(len(files)):
-    #     if files[i] not in BANNER_DATA["new_data"]:
-    #         BANNER_DATA["new_data"].append(files[i])
-    #     continue
-    # for item in BANNER_DATA["new_data"]:
-    #     if item not in files:
-    #         BANNER_DATA["new_data"].remove(item)
-    # if files != list(BANNER_DATA_old):
-    #     new_files = list(set(files).difference(set(BANNER_DATA_old)))
-    #     old_files = []
-    #     for item in BANNER_DATA_old:
-    #         if item.replace("images/banner/", '') not in files:
-    #             old_files.append(item)
-    #     print("THIIIIIIIS", files)
-    #     print("OOOOOOOOOOOLDS", old_files)
-    #     links = []
-    #     for item in new_files:
-    #         a = shutil.copyfile(
-    #             f"//WHITEEVILBRO-LA/Share/{item}", f"{os.getcwd()}\\static\\images\\banner\\{item}")
-    #         links.append(f"images/banner/{item}")
-    #     for item in old_files:
-    #         os.remove(f"{os.getcwd()}\\static\\images\\banner\\{item}")
-    #     BANNER_DATA = {"new_data": links, "old_data": old_files}
-    # else:
-    #     print("DATA NOT UPDATED")
 
 
 def update_schedule_json_data():
@@ -108,14 +95,17 @@ def update_schedule_json_data():
 
 
 scheduler = BackgroundScheduler()
-job_banner = scheduler.add_job(update_banner_data, 'interval', minutes=0.08)
+job_banner = scheduler.add_job(update_banner_data, 'interval', minutes=0.1)
 job_parser = scheduler.add_job(
     update_schedule_json_data, 'interval', minutes=30)
 
 
 @socketio.on("request-banner")
 def sendBanner():
-    emit('response-banner', BANNER_DATA)
+    new_data = BANNER_DATA.copy()
+    new_data["new_data"] = [urllib.parse.quote_plus(item).replace(r"%2F", "/")
+                            for item in BANNER_DATA.copy()["new_data"]]
+    emit('response-banner', new_data)
 
 
 @socketio.on("connect")
@@ -133,7 +123,6 @@ def handle_disconnect():
 @socketio.on("getClassData")
 def responseData(data):
     print("response-data")
-    print(data)
     if (isinstance(data, dict)) and ('item_id' in data.keys()):
         requested_data = data["item_id"].split(":")
         cashed_data[requested_data[0]][requested_data[1]].update({
