@@ -43,6 +43,11 @@ full_subj_name = {
     }
 
 
+class ProgressPlug:
+    def next(self): pass
+    def finish(self): pass
+
+
 class ScheduleProperties:
     bug_rows: list[int]
     useless_columns: list[int]
@@ -50,16 +55,17 @@ class ScheduleProperties:
     last_row: list[int]
     second_time: bool
 
-    def __init__(self, _bug_rows, _useless_columns, _useless_rows, _last_row, _second_time):
+    def __init__(self, _bug_rows, _useless_columns, _useless_rows, _last_row, _second_time, _progress):
         self.bug_rows = _bug_rows
         self.useless_columns = _useless_columns
         self.useless_rows = _useless_rows
         self.last_row = _last_row
         self.second_time = _second_time
+        self.progress = _progress
 
 
-first_table_properties = ScheduleProperties([22, 34, 37, 67], [1, 24, 41], [15, 27, 38, 51, 64, 76], 75, True)
-second_table_properties = ScheduleProperties([], [1, 23, 40], [17, 18, 33, 34, 49, 50, 65, 66, 81, 82], 96, False)
+first_table_properties = ScheduleProperties([22, 34, 37, 67], [1, 24, 41], [15, 27, 38, 51, 64, 76], 75, True, 4295)
+second_table_properties = ScheduleProperties([], [1, 23, 40], [17, 18, 33, 34, 49, 50, 65, 66, 81, 82], 96, False, 4885)
 
 
 def validate_str(__s):
@@ -78,3 +84,4 @@ def merge_dicts(_d1: dict, _d2: dict):
         for _group in d1[_class]:
             for _day in d1[_class][_group]:
                 d1[_class][_group][_day].extend(d2[_class][_group][_day])
+    return d1

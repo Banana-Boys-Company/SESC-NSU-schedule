@@ -4,42 +4,57 @@ import re
 from openpyxl.cell.cell import Cell
 from json import dumps, dump
 import copy
-from common import pattern, dow2dow, subj, validate_str, get_merged_cell_val, full_subj_name, first_table_properties, \
-    ScheduleProperties, second_table_properties
 from typing import IO
 from os.path import exists
 import io
+import progress.bar
+try:
+    from parser.common import pattern, dow2dow, subj, validate_str, get_merged_cell_val, full_subj_name, \
+        first_table_properties, ScheduleProperties, second_table_properties, merge_dicts, ProgressPlug
+except ImportError:
+    from common import pattern, dow2dow, subj, validate_str, get_merged_cell_val, full_subj_name, \
+        first_table_properties, ScheduleProperties, second_table_properties, merge_dicts, ProgressPlug
 
 
 class ScheduleParser:
     wb: xl.Workbook
     prop: ScheduleProperties
 
-    def __init__(self, table_path: str, _prop: ScheduleProperties):
-        self.prop = _prop
+    def __init__(self, table_path: str):
         self.refresh(table_path)
+
+    def __set_prop(self, _prop: ScheduleProperties):
+        self.prop = _prop
 
     def refresh(self, table_path: str):
         if exists(table_path):
             self.wb: xl.Workbook = xl.load_workbook(table_path)
         else:
             raise FileNotFoundError('File does not exist')
+        print('File loaded!')
 
-    def parse(self, sheet_name: str, fp: IO[str] = None):
+    def parse(self, sheet_name: str, _prop: ScheduleProperties, fp: IO[str] = None, bar_is_on: bool = False):
+
         # Loading xlsx file
         if sheet_name in self.wb.sheetnames:
             ws = self.wb[sheet_name]
         else:
             raise SheetTitleException('Sheet with this name does not exist')
-        if not re.match(r'[+w]t?', fp.mode):
-            raise io.UnsupportedOperation('File is not writable')
+        if fp:
+            if not re.match(r'[+w]t?', fp.mode):
+                raise io.UnsupportedOperation('File is not writable')
 
         # Initiating variables
+        self.__set_prop(_prop)
         classes = dict()
         same_lesson = False
         times = []
         row_to_day_of_the_week = dict()
         previous_day = ''
+        if bar_is_on:
+            bar = progress.bar.ChargingBar(f'Parsing {sheet_name}', max=_prop.progress)
+        else:
+            bar = ProgressPlug
 
         # Generating dictionary structure
         for i, column in enumerate(ws.iter_cols(max_row=2)):
@@ -51,6 +66,7 @@ class ScheduleParser:
                 continue
             classes.setdefault(__v, dict())
             classes[__v].setdefault(__val, dict())
+            bar.next()
 
         # They`re not needed anymore
         del __v, i, __val, column
@@ -60,6 +76,7 @@ class ScheduleParser:
             # First column. Data - days of week. Creating dictonary {row: day_of_week}
             if i == 0:
                 for row_, cell_ in enumerate(column[2:]):
+                    bar.next()
                     value = get_merged_cell_val(ws, cell_)
                     if type(cell_) == Cell and (cell_.value is not None):
                         if not [s for s in ws.merged_cells.ranges if cell_.coordinate in s]:
@@ -94,7 +111,7 @@ class ScheduleParser:
                 for row, cell in enumerate(column[2:]):
                     # Getting value of cell
                     val = validate_str(get_merged_cell_val(ws, cell))
-
+                    bar.next()
                     # Filtrating empty rows
                     if val == 'None':
                         if cell.row not in self.prop.useless_rows:
@@ -139,17 +156,24 @@ class ScheduleParser:
                     _day = __dict[__day]
                     for __lesson in _day:
                         __lesson[1] //= 2
+                        bar.next()
 
                 # Writing data in main dictionary
                 classes[class_num][group_num] = __dict
 
+        bar.finish()
+
         # Returning json with unicode characters
         if fp:
             dump(classes, fp=fp, ensure_ascii=False)
-        return dumps(classes, ensure_ascii=False)
+        return copy.deepcopy(classes)
 
 
 if __name__ == '__main__':
-    p = ScheduleParser('SESC_Timetable 2022_2023.xlsx', second_table_properties)
-    with open('json.json', 'w', encoding='utf8') as file:
-        json = p.parse('Расписание_1сем_2пол.дня', fp=file)
+    p = ScheduleParser('SESC_Timetable 2022_2023.xlsx')
+
+    json = p.parse('Расписание_1 сем', first_table_properties, bar_is_on=True)
+    json2 = p.parse('Расписание_1сем_2пол.дня', second_table_properties, bar_is_on=True)
+    alld = merge_dicts(json, json2)
+    with open('json.json', 'w') as file:
+        dump(alld, fp=file, ensure_ascii=False)
