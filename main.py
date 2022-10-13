@@ -1,7 +1,8 @@
 from flask import Flask, render_template, url_for, request
 from flask_socketio import SocketIO, emit
 from apscheduler.schedulers.background import BackgroundScheduler
-import parser.parser as parser
+import parser.parser as pars
+from parser.common import first_table_properties, second_table_properties, merge_dicts
 import urllib.request
 import json
 import os.path
@@ -15,6 +16,15 @@ app.config['SECRET_KEY'] = '&85e8hE1%J2&eH(D*E8i2v)5DoquH*)D'
 socketio = SocketIO(app)
 URL = "https://docs.google.com/spreadsheets/u/1/d/e/2PACX-1vQdS9Qd6cdKjcvTefM_PaaODSfpkpk55Zl2g4QxBVpKkUJsU1U08wKXdi6cSkNBAQ/pub?output=xlsx"
 clients = []
+parser = pars.ScheduleParser('data.xlsx')
+
+
+def parse_both_tables(bar_is_on=False):
+    dict1 = parser.parse('Расписание_1 сем', first_table_properties, bar_is_on=bar_is_on)
+    dict2 = parser.parse('Расписание_1сем_2пол.дня', second_table_properties, bar_is_on=bar_is_on)
+    full_dict = merge_dicts(dict1, dict2)
+    del dict1, dict2
+    return full_dict
 
 
 # Server data initialization
@@ -24,8 +34,8 @@ if os.path.exists("data.json"):
 else:
     if os.path.exists("data.xlsx"):
         with open("data.json", "w") as f:
-            cashed_data = parser.parse_schedule(
-                'data.xlsx', 'Расписание_1 сем', fp=f)
+            cashed_data = parse_both_tables(bar_is_on=True)
+            json.dump(cashed_data, fp=f)
     else:
         try:
             urllib.request.urlretrieve(URL, "data.xlsx")
@@ -33,8 +43,9 @@ else:
             print(Exception)
         else:
             with open("data.json", "w") as f:
-                cashed_data = parser.parse_schedule(
-                    'data.xlsx', 'Расписание_1 сем', fp=f)
+                cashed_data = parse_both_tables(bar_is_on=True)
+                json.dump(cashed_data, fp=f)
+
 try:
     BANNER_DATA = {"new_data": [f"images/banner/{element}" for element in os.listdir(
         "\\\\WHITEEVILBRO-LA\Share")], "old_data": [], "filenames": os.listdir(
