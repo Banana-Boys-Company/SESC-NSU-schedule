@@ -1,54 +1,64 @@
 /*стили для логотипа*/
 .lgbt {
-   margin-left: 2px;
-   margin-right: 5%;
-   max-width: 100px;
+   max-width: 70px;
    height: auto;
 }
 
+}
+body {
+   background-image: url(images/back/background.jpg)!important;
+}
 img {
    pointer-events: none;
 }
-
+.navbar {
+   opacity: 0.99;
+}
+.classbutton {
+   margin-right: 5px;
+   margin-bottom: 3px;
+   border: solid #345d32;
+   border-radius: 10px;
+   text-align:center;
+}
+#rip {
+   margin-right: 100px;
+}
 /*стили для dropdown*/
-.dropdown-menu .dropdown-menu {
-   top: auto;
-   left: 100%;
-   transform: translateY(-5rem);
-}
+/*для компов*/
+@media all and (min-width: 992px) {
+   .dropdown-menu li{ position: relative;    }
+   .nav-item .submenu{ 
+      display: none;
+      position: absolute;
+      left:100%; top:-7px;
+   }
+   .nav-item .submenu-left{ 
+      right:100%; left:auto;
+   }
+   .dropdown-menu > li:hover{ background-color: #f1f1f1 }
+   .dropdown-menu > li:hover > .submenu{ display: block; }
+}  
 
-.dropdown-item+.dropdown-menu {
-   display: none;
+/*Для мобилок */
+@media (max-width: 991px) {
+  .dropdown-menu .dropdown-menu{
+   margin-left:0.7rem; margin-right:0.7rem; margin-bottom: .5rem;
 }
-
-.dropdown-item:hover+.dropdown-menu,
-.dropdown-menu:hover {
-   display: block;
-}
-
-#footer {
-   visibility: visible;
 }
 
 #container-banner {
    width: auto;
-   max-width: 680px;
-   padding: 0 15px;
+   max-width: 100%;
 }
 
-.carousel {
-   height: 500px !important;
-}
 
 .carousel-inner img {
-   height: 400px !important;
+   height: 451px !important;
    margin: 0 auto;
 }
-
-.carousel-indicators li {
-   border-color: #000;
+.carousel {
+  height: 400px !important;
+  overflow: hidden;
 }
 
-.carousel-indicators .active {
-   background-color: #000;
-}

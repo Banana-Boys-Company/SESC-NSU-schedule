@@ -17,19 +17,14 @@ function banner_timer() {
 }
 
 socket.on('response-banner', data => {
-    console.log(data)
     let banner_links = []
     Array.from($('.banner-element')).forEach(function (el) {
         banner_links.push(el.children[0].getAttribute('src').replace("/static/", ""));
     });
-    console.log(banner_links)
     let is_same = (data['new_data'].length == banner_links.length) && data['new_data'].every(function (element, index) {
-        console.log(element)
-        console.log(banner_links[index])
 
         return element === banner_links[index];
     });
-    console.log(is_same)
     if (data['old_data'] != []) {
         let old_banners = []
         Array.from($('.banner-element')).forEach(function (el) {
@@ -50,15 +45,15 @@ socket.on('connect', () => {
     socket.send({ 'status': 200 })
 })
 
-let time_lst = ["1(8:30)", "2(9:15)", "3(10:20)", "4(11:25)", "5(12:30)", "6(13:25)"]
+let time_lst = ["1(8:30)", "2(9:15)", "3(10:20)", "4(11:25)", "5(12:30)", "6(13:25)", "6,5(15:00)", "7(16:00)", "8(16:50)", "9(18:00)", "10(18:50)", "11(20:30)", "12(21:20)"]
 
 let weekDay_title = [
-    '    <div class="tab-pane fade show active" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab">',
-    '    <div class="tab-pane fade" id="pills-Tuesday" role="tabpanel" aria-labelledby="pill-Tuesday-tab">',
-    '    <div class="tab-pane fade" id="pills-Wednesday" role="tabpanel" aria-labelledby="pill-Wednesday-tab">',
-    '    <div class="tab-pane fade" id="pills-Thursday" role="tabpanel" aria-labelledby="pill-Thursday-tab">',
-    '    <div class="tab-pane fade" id="pills-Friday" role="tabpanel" aria-labelledby="pill-Friday-tab">',
-    '    <div class="tab-pane fade" id="pills-Saturday" role="tabpanel" aria-labelledby="pill-Saturday-tab">'
+'    <div class="tab-pane fade show active" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab">',
+'    <div class="tab-pane fade" id="pills-Tuesday" role="tabpanel" aria-labelledby="pill-Tuesday-tab">',
+'    <div class="tab-pane fade" id="pills-Wednesday" role="tabpanel" aria-labelledby="pill-Wednesday-tab">',
+'    <div class="tab-pane fade" id="pills-Thursday" role="tabpanel" aria-labelledby="pill-Thursday-tab">',
+'    <div class="tab-pane fade" id="pills-Friday" role="tabpanel" aria-labelledby="pill-Friday-tab">',
+'    <div class="tab-pane fade" id="pills-Saturday" role="tabpanel" aria-labelledby="pill-Saturday-tab">'
 ]
 
 // Код после полной загрузки страницы
@@ -68,7 +63,7 @@ $(document).ready(function () {
 
     $('.get-table').on("click", function (el) {
 
-        $('#footer').css({ 'visibility': 'hidden', 'display': 'none' })
+        $('#container-banner').css({ 'visibility': 'hidden', 'display': 'none' })
 
         $(".child-window-menu-1").hide();
         $(".child-window-menu-2").hide();
@@ -78,64 +73,130 @@ $(document).ready(function () {
         socket.emit('getClassData', { 'item_id': el.target.id });
     });
 
-    // Нажатие на дочерние меню 9 класса
-
-
-    let toggle_1 = 0;
-    let toggle_2 = 0;
-    let toggle_3 = 0;
-    $(".child-toggle-1").on("click", function () {
-        if (toggle_1 >= 1) {
-            $(".child-window-menu-1").toggle();
-            $(".child-window-menu-2").hide();
-            $(".child-window-menu-3").hide();
-        }
-        toggle_1++;
-    });
-
-    // Нажатие на дочерние меню 10 класса
-    $(".child-toggle-2").on("click", function () {
-        if (toggle_2 >= 1) {
-            $(".child-window-menu-2").toggle();
-            $(".child-window-menu-1").hide();
-            $(".child-window-menu-3").hide();
-        }
-        toggle_2++;
-    });
-
-    // Нажатие на дочерние меню 11 класса
-    $(".child-toggle-3").on("click", function () {
-        if (toggle_3 >= 1) {
-            $(".child-window-menu-3").toggle();
-            $(".child-window-menu-1").hide();
-            $(".child-window-menu-2").hide();
-        }
-        toggle_3++;
-    });
-
-
-    // Перезапуск таймера при активности
     $('html').click(function () {
         clearTimeout(timer_);
         timer_ = setTimeout(function () {
             location.reload();
-        }, 10000)
+        }, 100000)
     });
-});
+
+    $(".dropdown-menu").each(function(element) {
+
+        this.click(function (el) {
+            el.stopPropagation();
+        })});
+    document.querySelectorAll('.dropdown-menu').forEach(function(element){
+        element.addEventListener('click', function (e) {
+          e.stopPropagation();
+      });
+    })
+
+
+
+        // make it as accordion for smaller screens
+        if (window.innerWidth < 992) {
+
+            // close all inner dropdowns when parent is closed
+            document.querySelectorAll('.navbar .dropdown').forEach(function(everydropdown){
+                everydropdown.addEventListener('hidden.bs.dropdown', function () {
+                    // after dropdown is hidden, then find all submenus
+                    this.querySelectorAll('.submenu').forEach(function(everysubmenu){
+                        // hide every submenu as well
+                        everysubmenu.style.display = 'none';
+                    });
+                })
+            });
+            
+            document.querySelectorAll('.dropdown-menu a').forEach(function(element){
+                element.addEventListener('click', function (e) {
+                    
+                    let nextEl = this.nextElementSibling;
+                    if(nextEl && nextEl.classList.contains('submenu')) {    
+                        // prevent opening link if link needs to open dropdown
+                        e.preventDefault();
+                        console.log(nextEl);
+                        if(nextEl.style.display == 'block'){
+                            nextEl.style.display = 'none';
+                        } else {
+                            nextEl.style.display = 'block';
+                        }
+
+                    }
+                });
+            })
+        }
+    // if (window.innerWidth < 992) {
+    //     $('.navbar .dropdown').each(function(index){
+    //         $(this).on("hidden.bs.dropdown", function (el) {
+    //             $(this).find("ul").each(function(jindex){
+    //                 $(this).css("display", "none");
+    //             });
+    //         })
+    //         // OK
+    //     });
+
+    //     $('.dropdown-menu a').each(function(element){
+    //         $(this).click((el) => {
+    //             let nextEl = $(this).next();
+    //             if(nextEl && nextEl.find('.submenu')) {    
+    //                 el.preventDefault();
+    //                 console.log(nextEl);
+    //                 if(nextEl.css("display") == 'block'){
+    //                     nextEl.css("display") = 'none';
+    //                 } else {
+    //                     nextEl.css("display", 'block');
+    //                 }
+
+    //             }
+    //         })
+    //     })
+
+    // };
+})
+
+// make it as accordion for smaller screens
+// if (window.innerWidth < 992) {
+
+//     // close all inner dropdowns when parent is closed
+//     document.querySelectorAll('.navbar .dropdown').forEach(function(everydropdown){
+//         everydropdown.addEventListener('hidden.bs.dropdown', function () {
+//             // after dropdown is hidden, then find all submenus
+//             console.log("Старались, Кирюх");
+//             this.querySelectorAll('.submenu').forEach(function(everysubmenu){
+//                 // hide every submenu as well
+//                 everysubmenu.style.display = 'none';
+//             });
+//         })
+//     });
+
+// document.querySelectorAll('.dropdown-menu a').forEach(function(element){
+//     element.addEventListener('click', function (e) {
+
+//         let nextEl = this.nextElementSibling;
+//         if(nextEl && nextEl.classList.contains('submenu')) {    
+//                         // prevent opening link if link needs to open dropdown
+//                         e.preventDefault();
+//                         console.log(nextEl);
+//                         if(nextEl.style.display == 'block'){
+//                             nextEl.style.display = 'none';
+//                         } else {
+//                             nextEl.style.display = 'block';
+//                         }
+
+//                     }
+//                 });
+// })
+        // end if innerWidth
+
 
 // Получение данных расписания с сервера
 socket.on('schedule', data => {
-    console.log(data)
     if (data["status"] === 200) {
         console.log("Connection success!")
         generate_schedule_table(data, weekDay_title, time_lst)
     }
 })
 
-socket.on('banner_update', data => {
-    console.log("something")
-    console.log(data)
-})
 
 // Генерация расписания на основе данных с сервера
 function generate_schedule_table(data, weekDay_title, time_lst) {
@@ -193,4 +254,4 @@ function generate_schedule_table(data, weekDay_title, time_lst) {
     start += "</div>" // закрываем последний тег
     $('#main-page').append(start) //добавляем таблицу на страничку
 
-}
+};
