@@ -4,10 +4,17 @@
    height: auto;
 }
 
+html {
+   background-image: url("background.jpg");
+   height: 10%!important;
 }
+
 body {
-   background-image: url(images/back/background.jpg)!important;
+    height: 10%!important;
 }
+
+}
+
 img {
    pointer-events: none;
 }
@@ -21,9 +28,7 @@ img {
    border-radius: 10px;
    text-align:center;
 }
-#rip {
-   margin-right: 100px;
-}
+
 /*стили для dropdown*/
 /*для компов*/
 @media all and (min-width: 992px) {
@@ -42,23 +47,11 @@ img {
 
 /*Для мобилок */
 @media (max-width: 991px) {
-  .dropdown-menu .dropdown-menu{
+ .dropdown-menu .dropdown-menu{
    margin-left:0.7rem; margin-right:0.7rem; margin-bottom: .5rem;
 }
 }
-
-#container-banner {
-   width: auto;
-   max-width: 100%;
-}
-
-
-.carousel-inner img {
-   height: 451px !important;
-   margin: 0 auto;
-}
-.carousel {
-  height: 400px !important;
-  overflow: hidden;
+#clock {
+   text-align: center;
 }
 

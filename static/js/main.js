@@ -63,11 +63,12 @@ $(document).ready(function () {
 
     $('.get-table').on("click", function (el) {
 
-        $('#container-banner').css({ 'visibility': 'hidden', 'display': 'none' })
+        $('#banner').css({ 'visibility': 'hidden', 'display': 'none' })
 
-        $(".child-window-menu-1").hide();
-        $(".child-window-menu-2").hide();
-        $(".child-window-menu-3").hide();
+        if (window.innerWidth > 992) {
+            $(".classbutton").removeClass("show")
+            $(".dropdown-menu").removeClass("show")
+        }
 
         console.log("Send data")
         socket.emit('getClassData', { 'item_id': el.target.id });
@@ -79,6 +80,9 @@ $(document).ready(function () {
             location.reload();
         }, 100000)
     });
+
+    
+
 
     $(".dropdown-menu").each(function(element) {
 
@@ -96,97 +100,40 @@ $(document).ready(function () {
         // make it as accordion for smaller screens
         if (window.innerWidth < 992) {
 
-            // close all inner dropdowns when parent is closed
-            document.querySelectorAll('.navbar .dropdown').forEach(function(everydropdown){
-                everydropdown.addEventListener('hidden.bs.dropdown', function () {
-                    // after dropdown is hidden, then find all submenus
-                    this.querySelectorAll('.submenu').forEach(function(everysubmenu){
-                        // hide every submenu as well
-                        everysubmenu.style.display = 'none';
-                    });
-                })
-            });
-            
-            document.querySelectorAll('.dropdown-menu a').forEach(function(element){
-                element.addEventListener('click', function (e) {
-                    
-                    let nextEl = this.nextElementSibling;
-                    if(nextEl && nextEl.classList.contains('submenu')) {    
-                        // prevent opening link if link needs to open dropdown
-                        e.preventDefault();
-                        console.log(nextEl);
-                        if(nextEl.style.display == 'block'){
-                            nextEl.style.display = 'none';
-                        } else {
-                            nextEl.style.display = 'block';
-                        }
+  // close all inner dropdowns when parent is closed
+  document.querySelectorAll('.navbar .dropdown').forEach(function(everydropdown){
+    everydropdown.addEventListener('hidden.bs.dropdown', function () {
+      // after dropdown is hidden, then find all submenus
+      this.querySelectorAll('.submenu').forEach(function(everysubmenu){
+          // hide every submenu as well
+          everysubmenu.style.display = 'none';
 
-                    }
-                });
-            })
+      });
+  })
+});
+
+  document.querySelectorAll('.dropdown-menu a').forEach(function(element){
+    element.addEventListener('click', function (e) {
+        let fuck = document.getElementById("navbarSupportedContent")
+        let nextEl = this.nextElementSibling;
+        if(nextEl && nextEl.classList.contains('submenu')) {    
+          // prevent opening link if link needs to open dropdown
+          e.preventDefault();
+          if(nextEl.style.display == 'block'){
+            nextEl.style.display = 'none';
+        } else {
+            nextEl.style.display = 'block';
         }
-    // if (window.innerWidth < 992) {
-    //     $('.navbar .dropdown').each(function(index){
-    //         $(this).on("hidden.bs.dropdown", function (el) {
-    //             $(this).find("ul").each(function(jindex){
-    //                 $(this).css("display", "none");
-    //             });
-    //         })
-    //         // OK
-    //     });
-
-    //     $('.dropdown-menu a').each(function(element){
-    //         $(this).click((el) => {
-    //             let nextEl = $(this).next();
-    //             if(nextEl && nextEl.find('.submenu')) {    
-    //                 el.preventDefault();
-    //                 console.log(nextEl);
-    //                 if(nextEl.css("display") == 'block'){
-    //                     nextEl.css("display") = 'none';
-    //                 } else {
-    //                     nextEl.css("display", 'block');
-    //                 }
-
-    //             }
-    //         })
-    //     })
-
-    // };
+    }
+    else {
+        console.log("Опачки")
+        fuck.classList.remove("show")
+    }
+});
+})
+}
 })
 
-// make it as accordion for smaller screens
-// if (window.innerWidth < 992) {
-
-//     // close all inner dropdowns when parent is closed
-//     document.querySelectorAll('.navbar .dropdown').forEach(function(everydropdown){
-//         everydropdown.addEventListener('hidden.bs.dropdown', function () {
-//             // after dropdown is hidden, then find all submenus
-//             console.log("Старались, Кирюх");
-//             this.querySelectorAll('.submenu').forEach(function(everysubmenu){
-//                 // hide every submenu as well
-//                 everysubmenu.style.display = 'none';
-//             });
-//         })
-//     });
-
-// document.querySelectorAll('.dropdown-menu a').forEach(function(element){
-//     element.addEventListener('click', function (e) {
-
-//         let nextEl = this.nextElementSibling;
-//         if(nextEl && nextEl.classList.contains('submenu')) {    
-//                         // prevent opening link if link needs to open dropdown
-//                         e.preventDefault();
-//                         console.log(nextEl);
-//                         if(nextEl.style.display == 'block'){
-//                             nextEl.style.display = 'none';
-//                         } else {
-//                             nextEl.style.display = 'block';
-//                         }
-
-//                     }
-//                 });
-// })
-        // end if innerWidth
 
 
 // Получение данных расписания с сервера
@@ -255,3 +202,25 @@ function generate_schedule_table(data, weekDay_title, time_lst) {
     $('#main-page').append(start) //добавляем таблицу на страничку
 
 };
+
+function timeCount() {
+    var today = new Date();
+
+    var day = today.getDate();
+    var month = today.getMonth()+1;
+    var year = today.getFullYear();
+
+    var hour = today.getHours();
+    if(hour<10)hour = "0"+hour;
+
+    var minute = today.getMinutes();
+    if(minute<10)minute = "0"+minute;
+
+    var second = today.getSeconds();
+    if(second<10)second = "0"+second;
+
+    document.getElementById("clock").innerHTML = 
+    day+"/"+month+"/"+year+" | "+hour+":"+minute+":"+second;
+
+    setTimeout("timeCount()", 1000);
+}
