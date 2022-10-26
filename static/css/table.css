@@ -1,12 +1,13 @@
 /*Разметка кнопок*/
 #pills-tab{
 	padding-top: 10px;
-	max-width: 30%;
 	margin-left: 2%;
 }
 /*Цвет фона кнопок вкладок*/
 .nav-pills .nav-link.active, .nav-pills .show.nav-link {
 	background-color: #345d32!important;
+	color: white!important;
+	
 
 }
 /*Стиль цвета текста неактивных кнопок вкладок*/
@@ -19,6 +20,8 @@ table {
 	margin-left: 2%;
 	margin-right: 2%;
 }
+
+
 /*Стиль первого столбца таблицы*/
 #time {
 	width: 10%;
