@@ -2,7 +2,7 @@ import openpyxl as xl
 from openpyxl.utils.exceptions import SheetTitleException
 import re
 from openpyxl.cell.cell import Cell
-from json import dumps, dump
+from json import dump
 import copy
 from typing import IO
 from os.path import exists
@@ -175,10 +175,10 @@ class ScheduleParser:
 
     def parse_cources(self, sheet_name: str, fp: IO[str] = None):
         pat = {
-            '1600': [],
-            '1800': [],
-            '2000': [],
-            '2030': [],
+            '16:00': [],
+            '18:00': [],
+            '20:00': [],
+            '20:30': [],
             }
 
         patte = {
@@ -214,18 +214,14 @@ class ScheduleParser:
                 times = column[1:]
                 continue
             day = dow2dow[column[0].value.capitalize()]
-            # print(day)
-            # print(len(departments), '\n', column)
             for row, cell in enumerate(column[1:]):
                 if row == 0:
                     continue
                 department = department_to_id[get_merged_cell_val(ws, departments[row])]
-                # print(department)
                 if get_merged_cell_val(ws, times[row]) is None:
                     continue
                 time = get_merged_cell_val(ws, times[row]).strip().rstrip()
-                time = time[:2] + time[3:]
-                # print(time)
+                time = f'{time[:2]}:{time[3:]}'
                 try:
                     _ = courses[department]
                 except KeyError:
@@ -237,26 +233,14 @@ class ScheduleParser:
                 if cell.value is None:
                     continue
                 courses[department][day][time].append(cell.value)
-                # try:
-                #     if courses[department][day][time] == [None]:
-                #         continue
-                #     courses[department][day][time].append(cell.value)
-                #     # print(1)
-                # except KeyError:
-                #     # print(2)
-                #     courses[department][day][time] = copy.deepcopy([cell.value])
-                # print(courses[department][day][time])
+        if fp:
+            dump(courses, fp=fp, ensure_ascii=False)
         return courses
-
 
 
 
 if __name__ == '__main__':
     p = ScheduleParser('SESC_Timetable 2022_2023.xlsx')
-
-    # json = p.parse('Расписание_1 сем', first_table_properties, bar_is_on=True)
-    # json2 = p.parse('Расписание_1сем_2пол.дня', second_table_properties, bar_is_on=True)
     json = p.parse_cources('СПЕЦКУРСЫ')
-    # alld = merge_dicts(json, json2)
     with open('json.json', 'w') as file:
         dump(json, fp=file, ensure_ascii=False)
