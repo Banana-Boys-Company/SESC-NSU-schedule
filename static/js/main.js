@@ -8,14 +8,6 @@ var timer_ = setTimeout(function () {
     location.reload();
 }, 10000)
 
-function banner_timer() {
-    var timer_new = setTimeout(function () {
-        socket.emit('request-banner')
-        console.log('banner-requested')
-        banner_timer();
-    }, 10000)
-}
-
 socket.on('response-banner', data => {
     let banner_links = []
     Array.from($('.banner-element')).forEach(function (el) {
@@ -58,12 +50,15 @@ let weekDay_title = [
 
 // Код после полной загрузки страницы
 $(document).ready(function () {
-    banner_timer();
     // Выбор группы класса
 
     $(".get-course").on("click", function (el) {
+        $('#banner').css({ 'visibility': 'hidden', 'display': 'none' })
+        if (window.innerWidth > 992) {
+            $(".classbutton").removeClass("show")
+            $(".dropdown-menu").removeClass("show")
+        }
         socket.emit('getСoursesData', { 'item_id': el.target.id });
-        console.log()
     })
 
     $('.get-table').on("click", function (el) {
@@ -75,7 +70,6 @@ $(document).ready(function () {
             $(".dropdown-menu").removeClass("show")
         }
 
-        console.log("Send data")
         socket.emit('getClassData', { 'item_id': el.target.id });
     });
 
@@ -118,7 +112,6 @@ $(document).ready(function () {
       });
   })
 });
-
   document.querySelectorAll('.dropdown-menu a').forEach(function(element){
     element.addEventListener('click', function (e) {
         let fuck = document.getElementById("navbarSupportedContent")
@@ -133,7 +126,6 @@ $(document).ready(function () {
         }
     }
     else {
-        console.log("Опачки")
         fuck.classList.remove("show")
     }
 });
@@ -154,8 +146,9 @@ socket.on('schedule', data => {
 socket.on('courses', data => {
     console.log("Connection success!")
     console.log(data)
-}
-)
+    generate_courses_table(data)
+})
+
 
 
 // Генерация расписания на основе данных с сервера
@@ -215,6 +208,48 @@ function generate_schedule_table(data, weekDay_title, time_lst) {
     $('#main-page').append(start) //добавляем таблицу на страничку
 
 };
+
+function generate_courses_table(data) {
+    let const_ = '<table class="table table-bordered"><thead><tr><th scope="col" id="time">№ Урока</th><th scope="col">Урок</th></tr></thead><tbody>';
+    let specDayTab = [
+        '<div class="tab-pane fade show active" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab">',
+        '<div class="tab-pane fade" id="pills-Tuesday" role="tabpanel" aria-labelledby="pill-Tuesday-tab">',
+        '<div class="tab-pane fade" id="pills-Wednesday" role="tabpanel" aria-labelledby="pill-Wednesday-tab">',
+        '<div class="tab-pane fade" id="pills-Thursday" role="tabpanel" aria-labelledby="pill-Thursday-tab">',
+        '<div class="tab-pane fade" id="pills-Friday" role="tabpanel" aria-labelledby="pill-Friday-tab">',
+        '<div class="tab-pane fade" id="pills-Saturday" role="tabpanel" aria-labelledby="pill-Saturday-tab">',
+        '<div class="tab-pane fade" id="pills-Sunday" role="tabpanel" aria-labelledby="pill-Sunday-tab">',
+    ];
+    let weekDay_title = [
+        '<div class="tab-pane fade show active" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab">',
+        '<div class="tab-pane fade" id="pills-Tuesday" role="tabpanel" aria-labelledby="pill-Tuesday-tab">',
+        '<div class="tab-pane fade" id="pills-Wednesday" role="tabpanel" aria-labelledby="pill-Wednesday-tab">',
+        '<div class="tab-pane fade" id="pills-Thursday" role="tabpanel" aria-labelledby="pill-Thursday-tab">',
+        '<div class="tab-pane fade" id="pills-Friday" role="tabpanel" aria-labelledby="pill-Friday-tab">',
+        '<div class="tab-pane fade" id="pills-Saturday" role="tabpanel" aria-labelledby="pill-Saturday-tab">',
+        '<div class="tab-pane fade" id="pills-Sunday" role="tabpanel" aria-labelledby="pill-Sunday-tab">'
+    ];
+    $('#main-page').empty()
+    code = '<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist"><li class="nav-item" role="presentation"><button class="nav-link active" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"type="button" role="tab" aria-controls="Monday" aria-selected="true">Пн</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Tuesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Tuesday" type="button"role="tab" aria-controls="week-Tuesday" aria-selected="false">Вт</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Wednesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Wednesday"type="button" role="tab" aria-controls="week-Wednesday" aria-selected="false">Ср</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Thursday-tab" data-bs-toggle="pill" data-bs-target="#pills-Thursday"type="button" role="tab" aria-controls="week-Thursday" aria-selected="false">Чт</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Friday-tab" data-bs-toggle="pill" data-bs-target="#pills-Friday" type="button"role="tab" aria-controls="week-Friday" aria-selected="false">Пт</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Saturday-tab" data-bs-toggle="pill" data-bs-target="#pills-Saturday"type="button" role="tab" aria-controls="week-Saturday" aria-selected="false">Сб</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Sunday-tab" data-bs-toggle="pill" data-bs-target="#pills-Sunday"type="button" role="tab" aria-controls="week-Saturday" aria-selected="false">Вс</button></li></ul><div class="tab-content" id="weeks-tabContent">'
+    console.log("start")
+    for (let z = 0; z <= 6; z++) {
+        code += weekDay_title[z];
+        code += '<table class="table table-bordered"><thead><tr><th scope="col" id="time">Время</th><th scope="col">Спец-курс</th></tr></thead><tbody>';
+        lowerLevel = data[Object.keys(data)[z]]
+        for (i in lowerLevel) {
+            if (lowerLevel[i].length != 0) {
+                code += `<tr><th rowspan="${lowerLevel[i].length}">${i}</th><td>${lowerLevel[i][0]}</td></tr>`;
+                for (let j = 0; j <= lowerLevel[i].length - 1; j++) {
+                    code += `<tr><td>${lowerLevel[i][j]}</td></tr>`;
+                }
+            }
+        }
+        code += "</tbody></table></div>";
+    }
+    code += "</div>"
+    $('#main-page').append(code)
+}
+
 
 function timeCount() {
     var today = new Date();
