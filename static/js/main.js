@@ -61,6 +61,11 @@ $(document).ready(function () {
     banner_timer();
     // Выбор группы класса
 
+    $(".get-course").on("click", function (el) {
+        socket.emit('getСoursesData', { 'item_id': el.target.id });
+        console.log()
+    })
+
     $('.get-table').on("click", function (el) {
 
         $('#banner').css({ 'visibility': 'hidden', 'display': 'none' })
@@ -73,6 +78,8 @@ $(document).ready(function () {
         console.log("Send data")
         socket.emit('getClassData', { 'item_id': el.target.id });
     });
+
+
 
     $('html').click(function () {
         clearTimeout(timer_);
@@ -143,6 +150,12 @@ socket.on('schedule', data => {
         generate_schedule_table(data, weekDay_title, time_lst)
     }
 })
+
+socket.on('courses', data => {
+    console.log("Connection success!")
+    console.log(data)
+}
+)
 
 
 // Генерация расписания на основе данных с сервера

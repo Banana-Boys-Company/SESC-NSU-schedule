@@ -4,20 +4,6 @@
    height: auto;
 }
 
-html {
-   background-image: url("background.jpg");
-   height: 10%!important;
-}
-
-body {
-    height: 10%!important;
-}
-
-}
-
-img {
-   pointer-events: none;
-}
 .navbar {
    opacity: 0.99;
 }
@@ -55,3 +41,4 @@ img {
    text-align: center;
 }
 
+#banner {

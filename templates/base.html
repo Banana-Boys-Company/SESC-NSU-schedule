@@ -192,12 +192,22 @@
 						</li>
 					</ul>
 				</li>
-				<li class="nav-item">
+				<li class="nav-item dropdown">
 					<!-- кнопка спецкурсов -->
-					<a class="nav-link classbutton" href="#" id="navbarDropdown4">СПЕЦ-КУРСЫ</a>
+					<a class="nav-link dropdown-toggle classbutton" href="#" id="navbarDropdown4" data-bs-toggle="dropdown">Спецкурсы</a>
+					<ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
+						<li><a class="dropdown-item get-course" href="#" id="mat">Кафедра математики</a></li>
+						<li><a class="dropdown-item get-course" href="#" id="bio">Кафедра естественных наук</a></li>
+						<li><a class="dropdown-item get-course" href="#" id="rus">Кафедра Русской словесности</a></li>
+						<li><a class="dropdown-item get-course" href="#" id="phy">Кафедра физики</a></li>
+						<li><a class="dropdown-item get-course" href="#" id="hum">Кафедра гуманитарных наук</a></li>
+						<li><a class="dropdown-item get-course" href="#" id="chi">Кафедра химии</a></li>
+						<li><a class="dropdown-item get-course" href="#" id="inf">кафедра дискретной математики и информатики</a></li>
+						<li><a class="dropdown-item get-course" href="#" id="eng">Межкафедральная лаб. Инж. конструирования</a></li>
+					</ul>
 				</li>
 			</ul>
-			<ul class="navbar-nav ">
+			<ul class="navbar-nav">
 				<li class="nav-item text-md-center text-lg-end" id="timeContainer">
 					<div class="navbar-text" id="clock"></div>
 
@@ -217,27 +227,27 @@
 	</div>
 
 	{% if banner_links != [] %}
-		<div id="banner" class="carousel slide" data-bs-ride="carousel">
-			<div class="carousel-inner" id="carousel">
-				{% for item in banner_links %}
-				{% if loop.index0 == 0 %}
-				<div class="ratio ratio-16x9 carousel-item banner-element active";>
-					{% else %}
-					<div class="carousel-item banner-element ratio ratio-16x9">
-						{% endif %}
-						<img src="{{ url_for('static', filename=item) }}"  alt="Баннер">
-					</div>
-					{% endfor %}
+	<div id="banner" class="carousel slide" data-bs-ride="carousel">
+		<div class="carousel-inner" id="carousel">
+			{% for item in banner_links %}
+			{% if loop.index0 == 0 %}
+			<div class="ratio carousel-item banner-element active" style="--bs-aspect-ratio: 56.25%;">
+				{% else %}
+				<div class="carousel-item banner-element ratio" style="--bs-aspect-ratio: 56.25%;">
+					{% endif %}
+					<img src="{{ url_for('static', filename=item) }}"  alt="Баннер">
 				</div>
-				<button class="carousel-control-prev" type="button" data-bs-target="#banner" data-bs-slide="prev">
-					<span class="carousel-control-prev-icon" aria-hidden="true"></span>
-					<span class="visually-hidden">Предыдущий</span>
-				</button>
-				<button class="carousel-control-next" type="button" data-bs-target="#banner" data-bs-slide="next">
-					<span class="carousel-control-next-icon" aria-hidden="true"></span>
-					<span class="visually-hidden">Следующий</span>
-				</button>
+				{% endfor %}
 			</div>
+			<button class="carousel-control-prev" type="button" data-bs-target="#banner" data-bs-slide="prev">
+				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Предыдущий</span>
+			</button>
+			<button class="carousel-control-next" type="button" data-bs-target="#banner" data-bs-slide="next">
+				<span class="carousel-control-next-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Следующий</span>
+			</button>
+		</div>
 		{% endif %}
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
@@ -247,5 +257,4 @@
 		crossorigin="anonymous"></script>
 
 	</body>
-
 	</html>

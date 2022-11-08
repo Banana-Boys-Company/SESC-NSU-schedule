@@ -18,23 +18,31 @@ URL = "https://docs.google.com/spreadsheets/u/1/d/e/2PACX-1vQdS9Qd6cdKjcvTefM_Pa
 clients = []
 parser = pars.ScheduleParser('data.xlsx')
 
+courses_dict = {}
 
-def parse_both_tables(bar_is_on=False):
+def parse_both_tables(bar_is_on=False, only_courses=False):
+    if only_courses is True:
+        dict3 = parser.parse_cources("СПЕЦКУРСЫ")
+        print(dict3)    
+        return dict3
     dict1 = parser.parse('Расписание_1 сем', first_table_properties, bar_is_on=bar_is_on)
     dict2 = parser.parse('Расписание_1сем_2пол.дня', second_table_properties, bar_is_on=bar_is_on)
     full_dict = merge_dicts(dict1, dict2)
+    dict3 = parser.parse_cources("СПЕЦКУРСЫ")
+    print(dict3)
     del dict1, dict2
-    return full_dict
+    return full_dict, dict3
 
 
 # Server data initialization
 if os.path.exists("data.json"):
     with open('data.json', "r", encoding="cp1251") as f:
         cashed_data = json.load(f)
+        courses_dict = parse_both_tables(only_courses=True)
 else:
     if os.path.exists("data.xlsx"):
         with open("data.json", "w") as f:
-            cashed_data = parse_both_tables(bar_is_on=True)
+            cashed_data, courses_dict = parse_both_tables(bar_is_on=True)
             json.dump(cashed_data, fp=f)
     else:
         try:
@@ -43,7 +51,7 @@ else:
             print(Exception)
         else:
             with open("data.json", "w") as f:
-                cashed_data = parse_both_tables(bar_is_on=True)
+                cashed_data, courses_dict = parse_both_tables(bar_is_on=True)
                 json.dump(cashed_data, fp=f)
 
 try:
@@ -91,17 +99,17 @@ def update_banner_data():
 def update_schedule_json_data():
     print("Start updating data...")
     global cashed_data
+    global courses_dict
     try:
         urllib.request.urlretrieve(URL, "data.xlsx")
     except Exception:
         print("Downloading error, trying to open json data...")
         with open('data.json', "r", encoding="cp1251") as f:
             cashed_data = json.load(f)
+            courses_dict = parse_both_tables(only_courses=True)
         print("JSON data was loaded!")
     else:
-        with open("data.json", "w") as f:
-            cashed_data = parser.parse_schedule(
-                'data.xlsx', 'Расписание_1 сем', fp=f)
+        cashed_data, courses_dict = parse_both_tables(bar_is_on=True)
     print("Data updated!")
 
 
@@ -110,6 +118,14 @@ job_banner = scheduler.add_job(update_banner_data, 'interval', minutes=0.1)
 job_parser = scheduler.add_job(
     update_schedule_json_data, 'interval', minutes=30)
 
+@socketio.on("getСoursesData")
+def responseData_(data):
+    print("response-course")
+    if (isinstance(data, dict)) and ('item_id' in data.keys()):
+        print(courses_dict)
+        emit('courses', courses_dict[data["item_id"]])
+        return
+    return url_for("index")
 
 @socketio.on("request-banner")
 def sendBanner():
