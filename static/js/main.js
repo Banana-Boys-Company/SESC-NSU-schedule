@@ -5,7 +5,9 @@ const socket = io.connect("http://127.0.0.1:80")
 
 // Таймер неактивности, поистечению 5 минут перезагрузка
 var timer_ = setTimeout(function () {
-    location.reload();
+    if ($('#banner').css('display') == 'none') {
+        location.reload();
+    }
 }, 10000)
 
 socket.on('response-banner', data => {
@@ -40,12 +42,12 @@ socket.on('connect', () => {
 let time_lst = ["1(8:30)", "2(9:15)", "3(10:20)", "4(11:25)", "5(12:30)", "6(13:25)", "6,5(15:00)", "7(16:00)", "8(16:50)", "9(18:00)", "10(18:50)", "11(20:30)", "12(21:20)"]
 
 let weekDay_title = [
-'    <div class="tab-pane fade show active" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab">',
-'    <div class="tab-pane fade" id="pills-Tuesday" role="tabpanel" aria-labelledby="pill-Tuesday-tab">',
-'    <div class="tab-pane fade" id="pills-Wednesday" role="tabpanel" aria-labelledby="pill-Wednesday-tab">',
-'    <div class="tab-pane fade" id="pills-Thursday" role="tabpanel" aria-labelledby="pill-Thursday-tab">',
-'    <div class="tab-pane fade" id="pills-Friday" role="tabpanel" aria-labelledby="pill-Friday-tab">',
-'    <div class="tab-pane fade" id="pills-Saturday" role="tabpanel" aria-labelledby="pill-Saturday-tab">'
+    '    <div class="tab-pane fade show active" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab">',
+    '    <div class="tab-pane fade" id="pills-Tuesday" role="tabpanel" aria-labelledby="pill-Tuesday-tab">',
+    '    <div class="tab-pane fade" id="pills-Wednesday" role="tabpanel" aria-labelledby="pill-Wednesday-tab">',
+    '    <div class="tab-pane fade" id="pills-Thursday" role="tabpanel" aria-labelledby="pill-Thursday-tab">',
+    '    <div class="tab-pane fade" id="pills-Friday" role="tabpanel" aria-labelledby="pill-Friday-tab">',
+    '    <div class="tab-pane fade" id="pills-Saturday" role="tabpanel" aria-labelledby="pill-Saturday-tab">'
 ]
 
 // Код после полной загрузки страницы
@@ -78,59 +80,62 @@ $(document).ready(function () {
     $('html').click(function () {
         clearTimeout(timer_);
         timer_ = setTimeout(function () {
-            location.reload();
-        }, 100000)
+            if ($('#banner').css('display') == 'none') {
+                location.reload();
+            }
+        }, 10000)
     });
 
-    
 
 
-    $(".dropdown-menu").each(function(element) {
+
+    $(".dropdown-menu").each(function (element) {
 
         this.click(function (el) {
             el.stopPropagation();
-        })});
-    document.querySelectorAll('.dropdown-menu').forEach(function(element){
+        })
+    });
+    document.querySelectorAll('.dropdown-menu').forEach(function (element) {
         element.addEventListener('click', function (e) {
-          e.stopPropagation();
-      });
+            e.stopPropagation();
+        });
     })
 
 
 
-        // make it as accordion for smaller screens
-        if (window.innerWidth < 992) {
+    // make it as accordion for smaller screens
+    if (window.innerWidth < 992) {
 
-  // close all inner dropdowns when parent is closed
-  document.querySelectorAll('.navbar .dropdown').forEach(function(everydropdown){
-    everydropdown.addEventListener('hidden.bs.dropdown', function () {
-      // after dropdown is hidden, then find all submenus
-      this.querySelectorAll('.submenu').forEach(function(everysubmenu){
-          // hide every submenu as well
-          everysubmenu.style.display = 'none';
+        // close all inner dropdowns when parent is closed
+        document.querySelectorAll('.navbar .dropdown').forEach(function (everydropdown) {
+            everydropdown.addEventListener('hidden.bs.dropdown', function () {
+                // after dropdown is hidden, then find all submenus
+                this.querySelectorAll('.submenu').forEach(function (everysubmenu) {
+                    // hide every submenu as well
+                    everysubmenu.style.display = 'none';
 
-      });
-  })
-});
-  document.querySelectorAll('.dropdown-menu a').forEach(function(element){
-    element.addEventListener('click', function (e) {
-        let fuck = document.getElementById("navbarSupportedContent")
-        let nextEl = this.nextElementSibling;
-        if(nextEl && nextEl.classList.contains('submenu')) {    
-          // prevent opening link if link needs to open dropdown
-          e.preventDefault();
-          if(nextEl.style.display == 'block'){
-            nextEl.style.display = 'none';
-        } else {
-            nextEl.style.display = 'block';
-        }
+                });
+            })
+        });
+        document.querySelectorAll('.dropdown-menu a').forEach(function (element) {
+            element.addEventListener('click', function (e) {
+                let fuck = document.getElementById("navbarSupportedContent")
+                let nextEl = this.nextElementSibling;
+                if (nextEl && nextEl.classList.contains('submenu')) {
+                    // prevent opening link if link needs to open dropdown
+                    e.preventDefault();
+                    if (nextEl.style.display == 'block') {
+                        nextEl.style.display = 'none';
+                    } else {
+                        nextEl.style.display = 'block';
+                    }
+                }
+                else {
+                    fuck.classList.remove("show")
+                }
+            });
+        })
     }
-    else {
-        fuck.classList.remove("show")
-    }
-});
-})
-}
 })
 
 
@@ -138,14 +143,11 @@ $(document).ready(function () {
 // Получение данных расписания с сервера
 socket.on('schedule', data => {
     if (data["status"] === 200) {
-        console.log("Connection success!")
         generate_schedule_table(data, weekDay_title, time_lst)
     }
 })
 
 socket.on('courses', data => {
-    console.log("Connection success!")
-    console.log(data)
     generate_courses_table(data)
 })
 
@@ -231,7 +233,6 @@ function generate_courses_table(data) {
     ];
     $('#main-page').empty()
     code = '<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist"><li class="nav-item" role="presentation"><button class="nav-link active" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"type="button" role="tab" aria-controls="Monday" aria-selected="true">Пн</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Tuesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Tuesday" type="button"role="tab" aria-controls="week-Tuesday" aria-selected="false">Вт</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Wednesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Wednesday"type="button" role="tab" aria-controls="week-Wednesday" aria-selected="false">Ср</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Thursday-tab" data-bs-toggle="pill" data-bs-target="#pills-Thursday"type="button" role="tab" aria-controls="week-Thursday" aria-selected="false">Чт</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Friday-tab" data-bs-toggle="pill" data-bs-target="#pills-Friday" type="button"role="tab" aria-controls="week-Friday" aria-selected="false">Пт</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Saturday-tab" data-bs-toggle="pill" data-bs-target="#pills-Saturday"type="button" role="tab" aria-controls="week-Saturday" aria-selected="false">Сб</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Sunday-tab" data-bs-toggle="pill" data-bs-target="#pills-Sunday"type="button" role="tab" aria-controls="week-Saturday" aria-selected="false">Вс</button></li></ul><div class="tab-content" id="weeks-tabContent">'
-    console.log("start")
     for (let z = 0; z <= 6; z++) {
         code += weekDay_title[z];
         code += '<table class="table table-bordered"><thead><tr><th scope="col" id="time">Время</th><th scope="col">Спец-курс</th></tr></thead><tbody>';
@@ -255,20 +256,20 @@ function timeCount() {
     var today = new Date();
 
     var day = today.getDate();
-    var month = today.getMonth()+1;
+    var month = today.getMonth() + 1;
     var year = today.getFullYear();
 
     var hour = today.getHours();
-    if(hour<10)hour = "0"+hour;
+    if (hour < 10) hour = "0" + hour;
 
     var minute = today.getMinutes();
-    if(minute<10)minute = "0"+minute;
+    if (minute < 10) minute = "0" + minute;
 
     var second = today.getSeconds();
-    if(second<10)second = "0"+second;
+    if (second < 10) second = "0" + second;
 
-    document.getElementById("clock").innerHTML = 
-    day+"/"+month+"/"+year+" | "+hour+":"+minute+":"+second;
+    document.getElementById("clock").innerHTML =
+        day + "/" + month + "/" + year + " | " + hour + ":" + minute + ":" + second;
 
     setTimeout("timeCount()", 1000);
 }

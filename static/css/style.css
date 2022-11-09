@@ -7,38 +7,56 @@
 .navbar {
    opacity: 0.99;
 }
+
 .classbutton {
    margin-right: 5px;
    margin-bottom: 3px;
    border: solid #345d32;
    border-radius: 10px;
-   text-align:center;
+   text-align: center;
 }
 
 /*стили для dropdown*/
 /*для компов*/
 @media all and (min-width: 992px) {
-   .dropdown-menu li{ position: relative;    }
-   .nav-item .submenu{ 
+   .dropdown-menu li {
+      position: relative;
+   }
+
+   .nav-item .submenu {
       display: none;
       position: absolute;
-      left:100%; top:-7px;
+      left: 100%;
+      top: -7px;
    }
-   .nav-item .submenu-left{ 
-      right:100%; left:auto;
+
+   .nav-item .submenu-left {
+      right: 100%;
+      left: auto;
    }
-   .dropdown-menu > li:hover{ background-color: #f1f1f1 }
-   .dropdown-menu > li:hover > .submenu{ display: block; }
-}  
+
+   .dropdown-menu>li:hover {
+      background-color: #f1f1f1
+   }
+
+   .dropdown-menu>li:hover>.submenu {
+      display: block;
+   }
+}
 
 /*Для мобилок */
 @media (max-width: 991px) {
- .dropdown-menu .dropdown-menu{
-   margin-left:0.7rem; margin-right:0.7rem; margin-bottom: .5rem;
+   .dropdown-menu .dropdown-menu {
+      margin-left: 0.7rem;
+      margin-right: 0.7rem;
+      margin-bottom: .5rem;
+   }
 }
-}
+
 #clock {
    text-align: center;
 }
 
-#banner {
+.banner-image {
+   --bs-aspect-ratio: 56.25%;
+}
