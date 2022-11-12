@@ -1,3 +1,4 @@
+import shutil
 from flask import Flask, render_template, url_for, request
 from flask_socketio import SocketIO, emit
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -10,7 +11,6 @@ import os.path
 import urllib.parse
 import eventlet
 eventlet.monkey_patch()
-import shutil
 
 app = Flask(__name__)
 
@@ -22,12 +22,15 @@ parser = pars.ScheduleParser('data.xlsx')
 
 courses_dict = {}
 
+
 def parse_both_tables(bar_is_on=False, only_courses=False):
     if only_courses is True:
         dict3 = parser.parse_cources("СПЕЦКУРСЫ")
         return dict3
-    dict1 = parser.parse('Расписание_1 сем', first_table_properties, bar_is_on=bar_is_on)
-    dict2 = parser.parse('Расписание_1сем_2пол.дня', second_table_properties, bar_is_on=bar_is_on)
+    dict1 = parser.parse('Расписание_1 сем',
+                         first_table_properties, bar_is_on=bar_is_on)
+    dict2 = parser.parse('Расписание_1сем_2пол.дня',
+                         second_table_properties, bar_is_on=bar_is_on)
     full_dict = merge_dicts(dict1, dict2)
     dict3 = parser.parse_cources("СПЕЦКУРСЫ")
     del dict1, dict2
@@ -152,6 +155,8 @@ job_parser = scheduler.add_job(
     update_schedule_json_data, 'interval', minutes=30)
 
 courses_prefix = [el[-1] for el in list(department_to_id.items())]
+
+
 @socketio.on("getСoursesData")
 def responseData_(data):
     print("if")
@@ -187,8 +192,10 @@ def index():
     socketio.start_background_task(update_banner_data)
     return render_template("table.html", banner_links=BANNER_DATA["new_data"])
 
+
 eventlet.spawn(update_banner_data)
 
 if __name__ == '__main__':
     scheduler.start()
-    socketio.run(app, port=80, host="127.0.0.1", debug=True)
+    socketio.run(app, port=80, host="127.0.0.1", debug=True,
+                 reloader_options={"reloader_type": 'stat'})

@@ -8,7 +8,7 @@ var timer_ = setTimeout(function () {
     if ($('#banner').css('display') == 'none') {
         location.reload();
     }
-}, 10000)
+}, 100000)
 
 socket.on('response-banner', data => {
     let banner_links = []
@@ -83,7 +83,7 @@ $(document).ready(function () {
             if ($('#banner').css('display') == 'none') {
                 location.reload();
             }
-        }, 10000)
+        }, 100000)
     });
 
 
