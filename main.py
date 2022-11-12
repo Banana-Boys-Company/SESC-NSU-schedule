@@ -195,6 +195,7 @@ def index():
 
 @app.route("/api/v<string:version>/test", methods=["POST", "GET"])
 def api(version):
+    print(request.args.get("token"))
     if version not in API_VERSIONS:
         return jsonify({
             "version": None,
