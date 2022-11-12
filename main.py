@@ -1,15 +1,16 @@
-import shutil
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, url_for, request, jsonify
 from flask_socketio import SocketIO, emit
 from apscheduler.schedulers.background import BackgroundScheduler
-import parser.parser as pars
-from parser.common import department_to_id
-from parser.common import first_table_properties, second_table_properties, merge_dicts
+import modules.parser.parser as pars
+from modules.parser.common import department_to_id
+from modules.parser.common import first_table_properties, second_table_properties, merge_dicts
 import urllib.request
 import json
 import os.path
+import shutil
 import urllib.parse
 import eventlet
+import modules.file_updater
 eventlet.monkey_patch()
 
 app = Flask(__name__)
@@ -19,7 +20,7 @@ socketio = SocketIO(app)
 URL = "https://docs.google.com/spreadsheets/u/1/d/e/2PACX-1vQdS9Qd6cdKjcvTefM_PaaODSfpkpk55Zl2g4QxBVpKkUJsU1U08wKXdi6cSkNBAQ/pub?output=xlsx"
 clients = []
 parser = pars.ScheduleParser('data.xlsx')
-
+API_VERSIONS = ["1"]
 courses_dict = {}
 
 
@@ -159,7 +160,6 @@ courses_prefix = [el[-1] for el in list(department_to_id.items())]
 
 @socketio.on("getСoursesData")
 def responseData_(data):
-    print("if")
     if (isinstance(data, dict)) and ('item_id' in data.keys()) and (data["item_id"] in courses_prefix):
         emit('courses', courses_dict[data["item_id"]])
         return
@@ -193,9 +193,24 @@ def index():
     return render_template("table.html", banner_links=BANNER_DATA["new_data"])
 
 
+@app.route("/api/v<string:version>/test", methods=["POST", "GET"])
+def api(version):
+    if version not in API_VERSIONS:
+        return jsonify({
+            "version": None,
+            "error_message": "API version does not exist",
+            "code": 404
+        })
+    return jsonify({
+        "version": version,
+        "error_messaege": None,
+        "code": 200
+    })
+
+
 eventlet.spawn(update_banner_data)
 
 if __name__ == '__main__':
     scheduler.start()
-    socketio.run(app, port=80, host="127.0.0.1", debug=True,
+    socketio.run(app, port=80, host="0.0.0.0", debug=True,
                  reloader_options={"reloader_type": 'stat'})
