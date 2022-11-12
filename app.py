@@ -1,27 +1,46 @@
-from flask import Flask, render_template, url_for, request, jsonify
-from flask_socketio import SocketIO, emit
-from apscheduler.schedulers.background import BackgroundScheduler
-import modules.parser.parser as pars
-from modules.parser.common import department_to_id
 from modules.parser.common import first_table_properties, second_table_properties, merge_dicts
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, render_template, url_for, request, jsonify, g
+from apscheduler.schedulers.background import BackgroundScheduler
+from modules.parser.common import department_to_id
+from flask_socketio import SocketIO, emit
+from flask_sqlalchemy import SQLAlchemy
+import modules.parser.parser as pars
 import urllib.request
 import json
 import os.path
 import shutil
 import urllib.parse
 import eventlet
+import secrets
 import modules.file_updater
+import sqlite3
 eventlet.monkey_patch()
 
 app = Flask(__name__)
-
 app.config['SECRET_KEY'] = '&85e8hE1%J2&eH(D*E8i2v)5DoquH*)D'
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data/database.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db = SQLAlchemy(app)
 socketio = SocketIO(app)
-URL = "https://docs.google.com/spreadsheets/u/1/d/e/2PACX-1vQdS9Qd6cdKjcvTefM_PaaODSfpkpk55Zl2g4QxBVpKkUJsU1U08wKXdi6cSkNBAQ/pub?output=xlsx"
-clients = []
+
+
+class ApiData(db.Model):
+    token = db.Column(db.String, primary_key=True)
+    permission = db.Column(db.Integer, nullable=False, default=1)
+
+    def __repr__(self) -> str:
+        return "<ApiData %r>" % self.token
+
+
+PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
+DATABASE = os.path.join(PROJECT_ROOT, 'data', 'database.db')
+EXEL_TABLE_URL = "https://docs.google.com/spreadsheets/u/1/d/e/2PACX-1vQdS9Qd6cdKjcvTefM_PaaODSfpkpk55Zl2g4QxBVpKkUJsU1U08wKXdi6cSkNBAQ/pub?output=xlsx"
+API_VERSION = ["1"]
+CLIENTS = []
+COURSES_DATA = {}
+
 parser = pars.ScheduleParser('data.xlsx')
-API_VERSIONS = ["1"]
-courses_dict = {}
 
 
 def parse_both_tables(bar_is_on=False, only_courses=False):
@@ -38,51 +57,70 @@ def parse_both_tables(bar_is_on=False, only_courses=False):
     return full_dict, dict3
 
 
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+        db.row_factory = sqlite3.Row
+    return db
+
+
+def query_db(query, args=(), one=False):
+    cur = get_db().execute(query, args)
+    rv = cur.fetchall()
+    cur.close()
+    return (rv[0] if rv else None) if one else rv
+
+
+with app.app_context():
+    API_OWNER = query_db(
+        "SELECT token FROM api WHERE permission=100", one=True)["token"]
+
 # Server data initialization
 if os.path.exists("data.json"):
     with open('data.json', "r", encoding="cp1251") as f:
         cashed_data = json.load(f)
     if os.path.exists("courses.json"):
         with open('courses.json', "r", encoding="cp1251") as f:
-            courses_dict = json.load(f)
+            COURSES_DATA = json.load(f)
 else:
     if os.path.exists("data.xlsx"):
         with open("data.json", "w") as f:
-            cashed_data, courses_dict = parse_both_tables(bar_is_on=True)
+            cashed_data, COURSES_DATA = parse_both_tables(bar_is_on=True)
             json.dump(cashed_data, fp=f)
         if os.path.exists("courses.json"):
             with open('courses.json', "r", encoding="cp1251") as f:
-                json.dump(courses_dict, fp=f)
+                json.dump(COURSES_DATA, fp=f)
     else:
         try:
-            urllib.request.urlretrieve(URL, "data.xlsx")
+            urllib.request.urlretrieve(EXEL_TABLE_URL, "data.xlsx")
         except Exception:
             print(Exception)
         else:
             with open("data.json", "w") as f:
-                cashed_data, courses_dict = parse_both_tables(bar_is_on=True)
+                cashed_data, COURSES_DATA = parse_both_tables(bar_is_on=True)
                 json.dump(cashed_data, fp=f)
             if os.path.exists("courses.json"):
                 with open('courses.json', "r", encoding="cp1251") as f:
-                    json.dump(courses_dict, fp=f)
+                    json.dump(COURSES_DATA, fp=f)
 
-if os.path.exists("courses.json") and (courses_dict == {}):
+if os.path.exists("courses.json") and (COURSES_DATA == {}):
     with open('courses.json', "r", encoding="cp1251") as f:
-        courses_dict = json.load(f)
+        COURSES_DATA = json.load(f)
 else:
     if os.path.exists("data.xlsx"):
         with open("courses.json", "w") as f:
-            courses_dict = parse_both_tables(only_courses=True)
-            json.dump(courses_dict, fp=f)
+            COURSES_DATA = parse_both_tables(only_courses=True)
+            json.dump(COURSES_DATA, fp=f)
     else:
         try:
-            urllib.request.urlretrieve(URL, "data.xlsx")
+            urllib.request.urlretrieve(EXEL_TABLE_URL, "data.xlsx")
         except Exception:
             print(Exception)
         else:
             with open("courses.json", "w") as f:
-                courses_dict = parse_both_tables(only_courses=True)
-                json.dump(courses_dict, fp=f)
+                COURSES_DATA = parse_both_tables(only_courses=True)
+                json.dump(COURSES_DATA, fp=f)
 
 
 # Banner initialization
@@ -137,17 +175,17 @@ def update_banner_data():
 def update_schedule_json_data():
     print("Start updating data...")
     global cashed_data
-    global courses_dict
+    global COURSES_DATA
     try:
-        urllib.request.urlretrieve(URL, "data.xlsx")
+        urllib.request.urlretrieve(EXEL_TABLE_URL, "data.xlsx")
     except Exception:
         print("Downloading error, trying to open json data...")
         with open('data.json', "r", encoding="cp1251") as f:
             cashed_data = json.load(f)
-            courses_dict = parse_both_tables(only_courses=True)
+            COURSES_DATA = parse_both_tables(only_courses=True)
         print("JSON data was loaded!")
     else:
-        cashed_data, courses_dict = parse_both_tables(bar_is_on=True)
+        cashed_data, COURSES_DATA = parse_both_tables(bar_is_on=True)
     print("Data updated!")
 
 
@@ -161,19 +199,19 @@ courses_prefix = [el[-1] for el in list(department_to_id.items())]
 @socketio.on("getСoursesData")
 def responseData_(data):
     if (isinstance(data, dict)) and ('item_id' in data.keys()) and (data["item_id"] in courses_prefix):
-        emit('courses', courses_dict[data["item_id"]])
+        emit('courses', COURSES_DATA[data["item_id"]])
         return
     return url_for("index")
 
 
 @socketio.on("connect")
 def getConnection(data):
-    clients.append(request.sid)
+    CLIENTS.append(request.sid)
 
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    clients.remove(request.sid)
+    CLIENTS.remove(request.sid)
 
 
 @socketio.on("getClassData")
@@ -187,26 +225,57 @@ def responseData(data):
     return url_for("index")
 
 
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
+
+
 @app.route("/")
 def index():
     socketio.start_background_task(update_banner_data)
     return render_template("table.html", banner_links=BANNER_DATA["new_data"])
 
+# admin token --> O4ymBcTmiAFVIop17RLc57sDf4lW3RBkWdyZpC-6MZ8
+
 
 @app.route("/api/v<string:version>/test", methods=["POST", "GET"])
 def api(version):
-    print(request.args.get("token"))
-    if version not in API_VERSIONS:
+    response = {}
+    if version not in API_VERSION:
         return jsonify({
             "version": None,
             "error_message": "API version does not exist",
             "code": 404
         })
-    return jsonify({
-        "version": version,
-        "error_messaege": None,
-        "code": 200
-    })
+    token = request.args.get("token")
+    if check_password_hash(API_OWNER, token):
+        token = API_OWNER
+        response["owner"] = True
+    if token is not None:
+        print(token)
+        authorization = query_db(
+            "SELECT token FROM api WHERE token = ?", (token,), one=True)
+    else:
+        authorization = None
+
+    if authorization is None:
+        response["status"] = "unauthorized"
+        response["role"] = {
+            "permission": 0
+        }
+    else:
+        response["status"] = "authorized"
+        response["role"] = {
+            "permission": query_db("SELECT permission FROM api WHERE token = ?", (token,), one=True)["permission"]
+        }
+
+    response["version"] = version
+    response["error_message"] = None
+    response["code"] = 200
+
+    return jsonify(response)
 
 
 eventlet.spawn(update_banner_data)
