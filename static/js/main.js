@@ -39,7 +39,7 @@ socket.on('connect', () => {
     socket.send({ 'status': 200 })
 })
 
-let time_lst = ["1(8:30)", "2(9:15)", "3(10:20)", "4(11:25)", "5(12:30)", "6(13:25)", "6,5(15:00)", "7(16:00)", "8(16:50)", "9(18:00)", "10(18:50)", "11(20:30)", "12(21:20)"]
+let time_lst = ["1(8:30)", "2(9:15)", "3(10:20)", "4(11:25)", "5(12:30)", "6(13:25)", "(15:00)", "7(16:00)", "8(16:50)", "9(18:00)", "10(18:50)", "11(20:30)", "12(21:20)"]
 
 let weekDay_title = [
     '    <div class="tab-pane fade show active" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab">',
@@ -239,8 +239,8 @@ function generate_courses_table(data) {
         lowerLevel = data[Object.keys(data)[z]]
         for (i in lowerLevel) {
             if (lowerLevel[i].length != 0) {
-                code += `<tr><th rowspan="${lowerLevel[i].length}">${i}</th><td>${lowerLevel[i][0]}</td></tr>`;
-                for (let j = 0; j <= lowerLevel[i].length - 1; j++) {
+                code += `<tr><th rowspan="${lowerLevel[i].length+1}">${i}</th><td>${lowerLevel[i][0]}</td></tr>`;
+                for (let j = 0; j <= lowerLevel[i].length-1; j++) {
                     code += `<tr><td>${lowerLevel[i][j]}</td></tr>`;
                 }
             }
