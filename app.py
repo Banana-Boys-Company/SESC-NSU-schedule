@@ -25,20 +25,15 @@ db = SQLAlchemy(app)
 socketio = SocketIO(app)
 
 
-class ApiData(db.Model):
-    token = db.Column(db.String, primary_key=True)
-    permission = db.Column(db.Integer, nullable=False, default=1)
-
-    def __repr__(self) -> str:
-        return "<ApiData %r>" % self.token
-
-
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 DATABASE = os.path.join(PROJECT_ROOT, 'data', 'database.db')
 EXEL_TABLE_URL = "https://docs.google.com/spreadsheets/u/1/d/e/2PACX-1vQdS9Qd6cdKjcvTefM_PaaODSfpkpk55Zl2g4QxBVpKkUJsU1U08wKXdi6cSkNBAQ/pub?output=xlsx"
 API_VERSION = ["1"]
 CLIENTS = []
 COURSES_DATA = {}
+API_ADMIN_LOGIN = "admin"
+API_ADMIN_PASS = "very_secret"
+API_SESSION = {}
 
 parser = pars.ScheduleParser('data.xlsx')
 
@@ -240,41 +235,73 @@ def index():
 # admin token --> O4ymBcTmiAFVIop17RLc57sDf4lW3RBkWdyZpC-6MZ8
 
 
-@app.route("/api/v<string:version>/test", methods=["POST", "GET"])
-def api(version):
-    response = {}
+@app.route("/api/v<string:version>/get_owner", methods=["POST", "GET"])
+def api_get_owner(version):
     if version not in API_VERSION:
         return jsonify({
             "version": None,
             "error_message": "API version does not exist",
             "code": 404
         })
+    login = request.args.get("login")
+    password = request.args.get("password")
+    if (login != API_ADMIN_LOGIN) or (password != API_ADMIN_PASS):
+        return jsonify({
+            "version": version,
+            "error_message": "Incorrect login or password",
+            "code": 401
+        })
+    else:
+        return jsonify({
+            "version": version,
+            "owner_token": "O4ymBcTmiAFVIop17RLc57sDf4lW3RBkWdyZpC-6MZ8",
+            "error_message": None,
+            "code": 200,
+        })
+
+
+@app.route("/api/v<string:version>/test", methods=["POST", "GET"])
+def api_test(version):
+    response = {}
+    if version not in API_VERSION:
+        return jsonify({
+            "version": None,
+            "error_message": "API version does not exist",
+            "code": 401
+        })
     token = request.args.get("token")
-    if check_password_hash(API_OWNER, token):
-        token = API_OWNER
-        response["owner"] = True
     if token is not None:
-        print(token)
+        if check_password_hash(API_OWNER, token):
+            token = API_OWNER
+            response["owner"] = True
         authorization = query_db(
             "SELECT token FROM api WHERE token = ?", (token,), one=True)
+        if authorization is None:
+            response["status"] = "unauthorized"
+            response["role"] = {
+                "permission": 0
+            }
+            response["version"] = version
+            response["error_message"] = "Invalid API token"
+            response["code"] = 401
+            return jsonify(response)
     else:
-        authorization = None
-
-    if authorization is None:
         response["status"] = "unauthorized"
         response["role"] = {
             "permission": 0
         }
-    else:
-        response["status"] = "authorized"
-        response["role"] = {
-            "permission": query_db("SELECT permission FROM api WHERE token = ?", (token,), one=True)["permission"]
-        }
+        response["version"] = version
+        response["error_message"] = None
+        response["code"] = 200
+        return jsonify(response)
 
+    response["status"] = "authorized"
+    response["role"] = {
+        "permission": query_db("SELECT permission FROM api WHERE token = ?", (token,), one=True)["permission"]
+    }
     response["version"] = version
     response["error_message"] = None
     response["code"] = 200
-
     return jsonify(response)
 
 
