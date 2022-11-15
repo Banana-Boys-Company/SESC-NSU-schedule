@@ -8,7 +8,7 @@ var timer_ = setTimeout(function () {
     if ($('#banner').css('display') == 'none') {
         location.reload();
     }
-}, 10000)
+}, 100000)
 
 socket.on('response-banner', data => {
     let banner_links = []
@@ -83,7 +83,7 @@ $(document).ready(function () {
             if ($('#banner').css('display') == 'none') {
                 location.reload();
             }
-        }, 10000)
+        }, 100000)
     });
 
 
@@ -239,8 +239,8 @@ function generate_courses_table(data) {
         lowerLevel = data[Object.keys(data)[z]]
         for (i in lowerLevel) {
             if (lowerLevel[i].length != 0) {
-                code += `<tr><th rowspan="${lowerLevel[i].length+1}">${i}</th><td>${lowerLevel[i][0]}</td></tr>`;
-                for (let j = 0; j <= lowerLevel[i].length-1; j++) {
+                code += `<tr><th rowspan="${lowerLevel[i].length + 1}">${i}</th><td>${lowerLevel[i][0]}</td></tr>`;
+                for (let j = 0; j <= lowerLevel[i].length - 1; j++) {
                     code += `<tr><td>${lowerLevel[i][j]}</td></tr>`;
                 }
             }
