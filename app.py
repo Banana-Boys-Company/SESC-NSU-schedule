@@ -1,10 +1,9 @@
 from modules.parser.common import first_table_properties, second_table_properties, merge_dicts
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 from flask import Flask, render_template, url_for, request, jsonify, g
 from apscheduler.schedulers.background import BackgroundScheduler
 from modules.parser.common import department_to_id
 from flask_socketio import SocketIO, emit
-from flask_sqlalchemy import SQLAlchemy
 import modules.parser.parser as pars
 import urllib.request
 import json
@@ -12,8 +11,6 @@ import os.path
 import shutil
 import urllib.parse
 import eventlet
-import secrets
-import modules.file_updater
 import sqlite3
 eventlet.monkey_patch()
 
@@ -21,7 +18,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '&85e8hE1%J2&eH(D*E8i2v)5DoquH*)D'
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data/database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
 socketio = SocketIO(app)
 
 
@@ -34,6 +30,7 @@ COURSES_DATA = {}
 API_ADMIN_LOGIN = "admin"
 API_ADMIN_PASS = "very_secret"
 API_SESSION = {}
+VALID_CLASSES = ["9_1", "9_2", "10_1", "11_12"]
 
 parser = pars.ScheduleParser('data.xlsx')
 
@@ -211,12 +208,21 @@ def handle_disconnect():
 
 @socketio.on("getClassData")
 def responseData(data):
-    if (isinstance(data, dict)) and ('item_id' in data.keys()):
-        requested_data = data["item_id"].split(":")
-        cashed_data[requested_data[0]][requested_data[1]].update({
-                                                                 "status": 200})
-        emit('schedule', cashed_data[requested_data[0]][requested_data[1]])
-        return
+    if isinstance(data, dict):
+        if 'get_all' in data.keys():
+            if data["get_all"] is True:
+                requested_data = data["item_id"].split(":")
+                if requested_data[-1] in VALID_CLASSES:
+                    response = cashed_data[requested_data[-1]].copy()
+                    emit('schedule', {"data": list(response.values()), "get_all": True, "status": 200})
+                    return
+            return url_for("index")
+        if 'item_id' in data.keys():
+            requested_data = data["item_id"].split(":")
+            cashed_data[requested_data[0]][requested_data[1]].update({
+                                                                    "status": 200})
+            emit('schedule', cashed_data[requested_data[0]][requested_data[1]])
+            return
     return url_for("index")
 
 
@@ -309,5 +315,5 @@ eventlet.spawn(update_banner_data)
 
 if __name__ == '__main__':
     scheduler.start()
-    socketio.run(app, port=80, host="0.0.0.0", debug=True,
+    socketio.run(app, port=80, host="127.0.0.1", debug=True,
                  reloader_options={"reloader_type": 'stat'})

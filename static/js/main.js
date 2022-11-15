@@ -10,6 +10,11 @@ var timer_ = setTimeout(function () {
     }
 }, 100000)
 
+let element_id = ""
+
+var today = new Date();
+let weekday = today.getDate()
+
 socket.on('response-banner', data => {
     let banner_links = []
     Array.from($('.banner-element')).forEach(function (el) {
@@ -54,6 +59,17 @@ let weekDay_title = [
 $(document).ready(function () {
     // Выбор группы класса
 
+    $(".get-class").on("click", function (el) {
+        console.log("click")
+        $('#banner').css({ 'visibility': 'hidden', 'display': 'none' })
+        if (window.innerWidth > 992) {
+            $(".classbutton").removeClass("show")
+            $(".dropdown-menu").removeClass("show")
+        }
+        element_id = el.target.id
+        socket.emit('getClassData', { 'item_id': el.target.id, 'get_all': true });
+    });
+
     $(".get-course").on("click", function (el) {
         $('#banner').css({ 'visibility': 'hidden', 'display': 'none' })
         if (window.innerWidth > 992) {
@@ -61,7 +77,7 @@ $(document).ready(function () {
             $(".dropdown-menu").removeClass("show")
         }
         socket.emit('getСoursesData', { 'item_id': el.target.id });
-    })
+    });
 
     $('.get-table').on("click", function (el) {
 
@@ -71,7 +87,7 @@ $(document).ready(function () {
             $(".classbutton").removeClass("show")
             $(".dropdown-menu").removeClass("show")
         }
-
+        element_id = el.target.id
         socket.emit('getClassData', { 'item_id': el.target.id });
     });
 
@@ -143,7 +159,11 @@ $(document).ready(function () {
 // Получение данных расписания с сервера
 socket.on('schedule', data => {
     if (data["status"] === 200) {
-        generate_schedule_table(data, weekDay_title, time_lst)
+        if (data["get_all"] === true) {
+            all_table(Object.values(data["data"]))
+        } else {
+            generate_schedule_table(data)
+        }
     }
 })
 
@@ -154,31 +174,35 @@ socket.on('courses', data => {
 
 
 // Генерация расписания на основе данных с сервера
-function generate_schedule_table(data, weekDay_title, time_lst) {
+function generate_schedule_table(data) {
     $('#main-page').empty() // отчистка места появления таблицы
-    let start = `<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    let response_data = element_id.split(":")
+    let start = `
+    <p class="ml-3">${response_data[0].split("_")[0]}-${response_data[0].split("_")[1]} класс | ${response_data[1]} группа</p>
+    <hr>
+    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
     <li class="nav-item" role="presentation">
-    <button class="nav-link active" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"
+    <button class="${today.getDay() == 1 ? "nav-link active" : "nav-link"}" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"
     type="button" role="tab" aria-controls="Monday" aria-selected="true">Пн</button>
     </li>
     <li class="nav-item" role="presentation">
-    <button class="nav-link" id="pills-Tuesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Tuesday" type="button"
+    <button class="${today.getDay() == 2 ? "nav-link active" : "nav-link"}" id="pills-Tuesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Tuesday" type="button"
     role="tab" aria-controls="week-Tuesday" aria-selected="false">Вт</button>
     </li>
     <li class="nav-item" role="presentation">
-    <button class="nav-link" id="pills-Wednesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Wednesday"
+    <button class="${today.getDay() == 3 ? "nav-link active" : "nav-link"}" id="pills-Wednesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Wednesday"
     type="button" role="tab" aria-controls="week-Wednesday" aria-selected="false">Ср</button>
     </li>
     <li class="nav-item" role="presentation">
-    <button class="nav-link" id="pills-Thursday-tab" data-bs-toggle="pill" data-bs-target="#pills-Thursday"
+    <button class="${today.getDay() == 4 ? "nav-link active" : "nav-link"}" id="pills-Thursday-tab" data-bs-toggle="pill" data-bs-target="#pills-Thursday"
     type="button" role="tab" aria-controls="week-Thursday" aria-selected="false">Чт</button>
     </li>
     <li class="nav-item" role="presentation">
-    <button class="nav-link" id="pills-Friday-tab" data-bs-toggle="pill" data-bs-target="#pills-Friday" type="button"
+    <button class="${today.getDay() == 5 ? "nav-link active" : "nav-link"}" id="pills-Friday-tab" data-bs-toggle="pill" data-bs-target="#pills-Friday" type="button"
     role="tab" aria-controls="week-Friday" aria-selected="false">Пт</button>
     </li>
     <li class="nav-item" role="presentation">
-    <button class="nav-link" id="pills-Saturday-tab" data-bs-toggle="pill" data-bs-target="#pills-Saturday"
+    <button class="${today.getDay() == 6 ? "nav-link active" : "nav-link"}" id="pills-Saturday-tab" data-bs-toggle="pill" data-bs-target="#pills-Saturday"
     type="button" role="tab" aria-controls="week-Saturday" aria-selected="false">Сб</button>
     </li>
     </ul>
@@ -212,16 +236,7 @@ function generate_schedule_table(data, weekDay_title, time_lst) {
 };
 
 function generate_courses_table(data) {
-    let const_ = '<table class="table table-bordered"><thead><tr><th scope="col" id="time">№ Урока</th><th scope="col">Урок</th></tr></thead><tbody>';
-    let specDayTab = [
-        '<div class="tab-pane fade show active" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab">',
-        '<div class="tab-pane fade" id="pills-Tuesday" role="tabpanel" aria-labelledby="pill-Tuesday-tab">',
-        '<div class="tab-pane fade" id="pills-Wednesday" role="tabpanel" aria-labelledby="pill-Wednesday-tab">',
-        '<div class="tab-pane fade" id="pills-Thursday" role="tabpanel" aria-labelledby="pill-Thursday-tab">',
-        '<div class="tab-pane fade" id="pills-Friday" role="tabpanel" aria-labelledby="pill-Friday-tab">',
-        '<div class="tab-pane fade" id="pills-Saturday" role="tabpanel" aria-labelledby="pill-Saturday-tab">',
-        '<div class="tab-pane fade" id="pills-Sunday" role="tabpanel" aria-labelledby="pill-Sunday-tab">',
-    ];
+    $('#main-page').empty()
     let weekDay_title = [
         '<div class="tab-pane fade show active" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab">',
         '<div class="tab-pane fade" id="pills-Tuesday" role="tabpanel" aria-labelledby="pill-Tuesday-tab">',
@@ -231,8 +246,7 @@ function generate_courses_table(data) {
         '<div class="tab-pane fade" id="pills-Saturday" role="tabpanel" aria-labelledby="pill-Saturday-tab">',
         '<div class="tab-pane fade" id="pills-Sunday" role="tabpanel" aria-labelledby="pill-Sunday-tab">'
     ];
-    $('#main-page').empty()
-    code = '<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist"><li class="nav-item" role="presentation"><button class="nav-link active" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"type="button" role="tab" aria-controls="Monday" aria-selected="true">Пн</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Tuesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Tuesday" type="button"role="tab" aria-controls="week-Tuesday" aria-selected="false">Вт</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Wednesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Wednesday"type="button" role="tab" aria-controls="week-Wednesday" aria-selected="false">Ср</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Thursday-tab" data-bs-toggle="pill" data-bs-target="#pills-Thursday"type="button" role="tab" aria-controls="week-Thursday" aria-selected="false">Чт</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Friday-tab" data-bs-toggle="pill" data-bs-target="#pills-Friday" type="button"role="tab" aria-controls="week-Friday" aria-selected="false">Пт</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Saturday-tab" data-bs-toggle="pill" data-bs-target="#pills-Saturday"type="button" role="tab" aria-controls="week-Saturday" aria-selected="false">Сб</button></li><li class="nav-item" role="presentation"><button class="nav-link" id="pills-Sunday-tab" data-bs-toggle="pill" data-bs-target="#pills-Sunday"type="button" role="tab" aria-controls="week-Saturday" aria-selected="false">Вс</button></li></ul><div class="tab-content" id="weeks-tabContent">'
+    code = `<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist"><li class="nav-item" role="presentation"><button class="${today.getDay() == 1 ? "nav-link active" : "nav-link"}" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"type="button" role="tab" aria-controls="Monday" aria-selected="true">Пн</button></li><li class="nav-item" role="presentation"><button class="${today.getDay() == 2 ? "nav-link active" : "nav-link"}" id="pills-Tuesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Tuesday" type="button"role="tab" aria-controls="week-Tuesday" aria-selected="false">Вт</button></li><li class="nav-item" role="presentation"><button class="${today.getDay() == 3 ? "nav-link active" : "nav-link"}" id="pills-Wednesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Wednesday"type="button" role="tab" aria-controls="week-Wednesday" aria-selected="false">Ср</button></li><li class="nav-item" role="presentation"><button class="${today.getDay() == 4 ? "nav-link active" : "nav-link"}" id="pills-Thursday-tab" data-bs-toggle="pill" data-bs-target="#pills-Thursday"type="button" role="tab" aria-controls="week-Thursday" aria-selected="false">Чт</button></li><li class="nav-item" role="presentation"><button class="${today.getDay() == 5 ? "nav-link active" : "nav-link"}" id="pills-Friday-tab" data-bs-toggle="pill" data-bs-target="#pills-Friday" type="button"role="tab" aria-controls="week-Friday" aria-selected="false">Пт</button></li><li class="nav-item" role="presentation"><button class="${today.getDay() == 6 ? "nav-link active" : "nav-link"}" id="pills-Saturday-tab" data-bs-toggle="pill" data-bs-target="#pills-Saturday"type="button" role="tab" aria-controls="week-Saturday" aria-selected="false">Сб</button></li><li class="nav-item" role="presentation"><button class="${today.getDay() == 0 ? "nav-link active" : "nav-link"}" id="pills-Sunday-tab" data-bs-toggle="pill" data-bs-target="#pills-Sunday"type="button" role="tab" aria-controls="week-Saturday" aria-selected="false">Вс</button></li></ul><div class="tab-content" id="weeks-tabContent">`
     for (let z = 0; z <= 6; z++) {
         code += weekDay_title[z];
         code += '<table class="table table-bordered"><thead><tr><th scope="col" id="time">Время</th><th scope="col">Спец-курс</th></tr></thead><tbody>';
@@ -250,26 +264,91 @@ function generate_courses_table(data) {
     code += "</div>"
     $('#main-page').append(code)
 }
+function all_table(data_lst) {
+    $('#main-page').empty()
+    let response_data = element_id.split(":")
+    console.log(response_data)
+    let start = `
+    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+    <button class="${today.getDay() == 1 ? "nav-link active" : "nav-link"}" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"
+    type="button" role="tab" aria-controls="Monday" aria-selected="true">Пн</button>
+    </li>
+    <li class="nav-item" role="presentation">
+    <button class="${today.getDay() == 2 ? "nav-link active" : "nav-link"}" id="pills-Tuesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Tuesday" type="button"
+    role="tab" aria-controls="week-Tuesday" aria-selected="false">Вт</button>
+    </li>
+    <li class="nav-item" role="presentation">
+    <button class="${today.getDay() == 3 ? "nav-link active" : "nav-link"}" id="pills-Wednesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Wednesday"
+    type="button" role="tab" aria-controls="week-Wednesday" aria-selected="false">Ср</button>
+    </li>
+    <li class="nav-item" role="presentation">
+    <button class="${today.getDay() == 4 ? "nav-link active" : "nav-link"}" id="pills-Thursday-tab" data-bs-toggle="pill" data-bs-target="#pills-Thursday"
+    type="button" role="tab" aria-controls="week-Thursday" aria-selected="false">Чт</button>
+    </li>
+    <li class="nav-item" role="presentation">
+    <button class="${today.getDay() == 5 ? "nav-link active" : "nav-link"}" id="pills-Friday-tab" data-bs-toggle="pill" data-bs-target="#pills-Friday" type="button"
+    role="tab" aria-controls="week-Friday" aria-selected="false">Пт</button>
+    </li>
+    <li class="nav-item" role="presentation">
+    <button class="${today.getDay() == 6 ? "nav-link active" : "nav-link"}" id="pills-Saturday-tab" data-bs-toggle="pill" data-bs-target="#pills-Saturday"
+    type="button" role="tab" aria-controls="week-Saturday" aria-selected="false">Сб</button>
+    </li>
+    <p class="ml-3">${response_data[1].split("_")[0]}-${response_data[1].split("_")[1]} класс</p>
+    </ul>
+    <div class="tab-content" id="weeks-tabContent">`
+    for (single_tab in data_lst) {
+        for (let i = 0; i <= 5; i++) {
+            start += weekDay_title[i] // добавление начала нужной вкладки из констант
+            start += '<table class="table table-bordered"><thead><tr><th scope="col" id="time">№ Урока</th><th scope="col">Урок</th></tr></thead><tbody>' //Первая строчка таблицы №Урока и Урок
+            timer = 0 // таймер для уроков(максимум 6)
+            for (let element in single_tab[Object.keys(single_tab)[i]]) {// циклом проходимся по каждому двумерному списку словаря используя ключи строго от monday к saturday            
+                let shablon = "" // в этом цикле создаем переменную шаблон для генерирования в ней самой таблицы каждого дня
+                shablon += `<tr><th scope="row" id="time">${time_lst[timer]}</th>`//прибавляем время
+                timer += 1
+                if (single_tab[Object.keys(single_tab)[i]][element][1] > 1) { // если высота строки больше 1
+                    shablon += `<td rowspan="${single_tab[Object.keys(single_tab)[i]][element][1]}" style="vertical-align: middle;">${single_tab[Object.keys(data)[i]][element][0]}</td></tr>` // задаем эту строку нужной высоты и добавляем стиль вертикального центрирования
+                    while (single_tab[Object.keys(single_tab)[i]][element][1] > 1) { // надо добавить h-1 пустых строк, чтобы таблица не сломалась(h - высота строки)
+                        shablon += `<tr><th scope="row" id="time">${time_lst[timer]}</th></tr>`
+                        timer += 1 // В первом столбце всегда будет 6 рядов, поэтому каждый раз генерим новую строку для 1 столбца и увеличиваем таймер
+                        single_tab[Object.keys(data)[i]][element][1] -= 1
+                    } // уменьшаем высоту уже выбранной строки, чтобы цикл не зациклился
+                }
+                else { // длинна строки может быть только 1, значит добавляем к шаблону f-строку с заданной высотой
+                    shablon += `<td rowspan="1">${single_tab[Object.keys(single_tab)[i]][element][0]}</td></tr>`
+                }
+                start += shablon // в конце прибавляем к start сморфированную таблицу
+            }
+            start += "</tbody></table></div>" // закрываем все теги
+        }
+        start += "</div>" // закрываем последний тег
+        $('#main-page').append(start) //добавляем таблицу на страничку
+    }
 
+}
+
+let weekday_string = ["Вс", "Пн.", "Вт.", "Ср.", "Чт.", "Пт.", "Сб."]
 
 function timeCount() {
-    var today = new Date();
+    today = new Date()
+    let day = today.getDate();
+    let month = today.getMonth() + 1;
+    let year = today.getFullYear();
 
-    var day = today.getDate();
-    var month = today.getMonth() + 1;
-    var year = today.getFullYear();
-
-    var hour = today.getHours();
+    let hour = today.getHours();
     if (hour < 10) hour = "0" + hour;
 
-    var minute = today.getMinutes();
+    let minute = today.getMinutes();
     if (minute < 10) minute = "0" + minute;
 
-    var second = today.getSeconds();
+    let second = today.getSeconds();
     if (second < 10) second = "0" + second;
 
+
+
     document.getElementById("clock").innerHTML =
-        day + "/" + month + "/" + year + " | " + hour + ":" + minute + ":" + second;
+        day + "/" + month + "/" + year + " | " + hour + ":" + minute + ":" + second + ` (${weekday_string[today.getDay()]})`;
 
     setTimeout("timeCount()", 1000);
 }
+
