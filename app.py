@@ -30,7 +30,8 @@ COURSES_DATA = {}
 API_ADMIN_LOGIN = "admin"
 API_ADMIN_PASS = "very_secret"
 API_SESSION = {}
-VALID_CLASSES = ["9_1", "9_2", "10_1", "11_12"]
+VALID_CLASSES = ["9_1", "9_2", "10_1", "10_2", "10_3", "10_4", "10_5", "10_6", "10_7", "10_8",
+                 "11_1", "11_2", "11_3", "11_4", "11_5", "11_6", "11_7", "11_8", "11_9", "11_10", "11_11" "11_12"]
 
 parser = pars.ScheduleParser('data.xlsx')
 
