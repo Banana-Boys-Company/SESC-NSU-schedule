@@ -1,7 +1,12 @@
 /*стили для логотипа*/
-.lgbt {
-   max-width: 70px;
-   height: auto;
+
+html {
+   background-image: url("/static/images/back/background.jpg");
+}
+
+.logo {
+   max-width: 100px;
+   max-height: 5%;
 }
 
 .navbar {
@@ -10,10 +15,10 @@
 
 .classbutton {
    margin-right: 5px;
-   margin-bottom: 3px;
    border: solid #345d32;
    border-radius: 10px;
    text-align: center;
+   text-size-adjust: 100px;
 }
 
 /*стили для dropdown*/
@@ -42,6 +47,10 @@
    .dropdown-menu>li:hover>.submenu {
       display: block;
    }
+   #clock {
+      font-size: 26px;
+      text-align: center;
+   }
 }
 
 /*Для мобилок */
@@ -51,12 +60,17 @@
       margin-right: 0.7rem;
       margin-bottom: .5rem;
    }
-}
-
-#clock {
+   .classbutton {
+      margin-bottom: 3px;
+   }
+   #clock {
+   font-size: 16px;
    text-align: center;
+   }
 }
 
-.banner-image {
-   --bs-aspect-ratio: 56.25%;
+
+.carousel {
+   width: 63.6%;
+   margin-left: 15.9%;
 }

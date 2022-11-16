@@ -1,19 +1,30 @@
 /*Разметка кнопок*/
-#pills-tab{
-	padding-top: 10px;
+#pills-tab {
 	margin-left: 2%;
-}
-/*Цвет фона кнопок вкладок*/
-.nav-pills .nav-link.active, .nav-pills .show.nav-link {
-	background-color: #345d32!important;
-	color: white!important;
 	
+}
+
+
+
+p {
+	padding-top: 10px;
+	text-align: center;
+}
+
+/*Цвет фона кнопок вкладок*/
+.nav-pills .nav-link.active,
+.nav-pills .show.nav-link {
+	background-color: #345d32 !important;
+	color: white !important;
+
 
 }
+
 /*Стиль цвета текста неактивных кнопок вкладок*/
 .nav-link {
-	color: black!important;
+	color: black !important;
 }
+
 /*Стили для таблицы*/
 table {
 	max-width: 96%;
