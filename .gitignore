@@ -1,2 +1,6 @@
 modules/parser/__pycache__
 modules/__pycache__
+data.json
+courses.json
+data.xlsx
+*.pyc

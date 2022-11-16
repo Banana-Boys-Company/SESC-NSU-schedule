@@ -79,10 +79,10 @@ else:
     if os.path.exists("data.xlsx"):
         with open("data.json", "w") as f:
             cashed_data, COURSES_DATA = parse_both_tables(bar_is_on=True)
-            json.dump(cashed_data, fp=f)
+            json.dump(cashed_data, fp=f, ensure_ascii=False)
         if os.path.exists("courses.json"):
             with open('courses.json', "r", encoding="cp1251") as f:
-                json.dump(COURSES_DATA, fp=f)
+                json.dump(COURSES_DATA, fp=f, ensure_ascii=False)
     else:
         try:
             urllib.request.urlretrieve(EXEL_TABLE_URL, "data.xlsx")
@@ -91,10 +91,10 @@ else:
         else:
             with open("data.json", "w") as f:
                 cashed_data, COURSES_DATA = parse_both_tables(bar_is_on=True)
-                json.dump(cashed_data, fp=f)
+                json.dump(cashed_data, fp=f, ensure_ascii=False)
             if os.path.exists("courses.json"):
                 with open('courses.json', "r", encoding="cp1251") as f:
-                    json.dump(COURSES_DATA, fp=f)
+                    json.dump(COURSES_DATA, fp=f, ensure_ascii=False)
 
 if os.path.exists("courses.json") and (COURSES_DATA == {}):
     with open('courses.json', "r", encoding="cp1251") as f:
@@ -103,7 +103,7 @@ else:
     if os.path.exists("data.xlsx"):
         with open("courses.json", "w") as f:
             COURSES_DATA = parse_both_tables(only_courses=True)
-            json.dump(COURSES_DATA, fp=f)
+            json.dump(COURSES_DATA, fp=f, ensure_ascii=False)
     else:
         try:
             urllib.request.urlretrieve(EXEL_TABLE_URL, "data.xlsx")
@@ -112,7 +112,7 @@ else:
         else:
             with open("courses.json", "w") as f:
                 COURSES_DATA = parse_both_tables(only_courses=True)
-                json.dump(COURSES_DATA, fp=f)
+                json.dump(COURSES_DATA, fp=f, ensure_ascii=False)
 
 
 # Banner initialization
