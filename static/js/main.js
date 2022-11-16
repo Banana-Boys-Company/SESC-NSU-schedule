@@ -153,6 +153,7 @@ socket.on('schedule', data => {
     if (data["status"] === 200) {
         if (data["get_all"] === true) {
             all_table(Object.values(data["data"]))
+            console.log("ВЫЗОВ")
         } else {
             generate_schedule_table(data)
         }
@@ -318,8 +319,8 @@ function all_table(data_lst) {
     <p class="ml-3">${response_data[1].split("_")[0]}-${response_data[1].split("_")[1]} класс</p>
     </ul>
     <div class="tab-content" id="weeks-tabContent">`
-    for (single_tab in data_lst) {
-        for (let i = 0; i <= 5; i++) {
+    for (let i = 0; i <= 5; i++) {
+        for (single_tab in data_lst) {
             start += weekDay_title[i] // добавление начала нужной вкладки из констант
             start += '<table class="table table-bordered"><thead><tr><th scope="col" id="time">№ Урока</th><th scope="col">Урок</th></tr></thead><tbody>' //Первая строчка таблицы №Урока и Урок
             timer = 0 // таймер для уроков(максимум 6)
@@ -340,11 +341,11 @@ function all_table(data_lst) {
                 }
                 start += shablon // в конце прибавляем к start сморфированную таблицу
             }
-            start += "</tbody></table></div>" // закрываем все теги
         }
-        start += "</div>" // закрываем последний тег
-        $('#main-page').append(start) //добавляем таблицу на страничку
+        start += "</tbody></table></div>" // закрываем все теги
     }
+    start += "</div>" // закрываем последний тег
+    $('#main-page').append(start) //добавляем таблицу на страничку
 
 }
 

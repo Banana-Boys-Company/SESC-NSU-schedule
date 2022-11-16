@@ -317,5 +317,5 @@ eventlet.spawn(update_banner_data)
 
 if __name__ == '__main__':
     scheduler.start()
-    socketio.run(app, port=80, host="0.0.0.0", debug=True,
+    socketio.run(app, port=80, host="127.0.0.1", debug=True,
                  reloader_options={"reloader_type": 'stat'})
