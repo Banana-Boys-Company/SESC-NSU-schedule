@@ -214,13 +214,14 @@ def responseData(data):
                 requested_data = data["item_id"].split(":")
                 if requested_data[-1] in VALID_CLASSES:
                     response = cashed_data[requested_data[-1]].copy()
-                    emit('schedule', {"data": list(response.values()), "get_all": True, "status": 200})
+                    emit('schedule', {"data": list(
+                        response.values()), "get_all": True, "status": 200})
                     return
             return url_for("index")
         if 'item_id' in data.keys():
             requested_data = data["item_id"].split(":")
             cashed_data[requested_data[0]][requested_data[1]].update({
-                                                                    "status": 200})
+                "status": 200})
             emit('schedule', cashed_data[requested_data[0]][requested_data[1]])
             return
     return url_for("index")
@@ -315,5 +316,5 @@ eventlet.spawn(update_banner_data)
 
 if __name__ == '__main__':
     scheduler.start()
-    socketio.run(app, port=80, host="127.0.0.1", debug=True,
+    socketio.run(app, port=80, host="0.0.0.0", debug=True,
                  reloader_options={"reloader_type": 'stat'})
