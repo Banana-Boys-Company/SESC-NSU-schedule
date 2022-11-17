@@ -52,7 +52,6 @@ $(document).ready(function () {
     // Выбор группы класса
 
     $(".get-class").on("click", function (el) {
-        console.log("click")
         $('#banner').css({ 'visibility': 'hidden', 'display': 'none' })
         if (window.innerWidth > 992) {
             $(".classbutton").removeClass("show")
@@ -153,7 +152,6 @@ socket.on('schedule', data => {
     if (data["status"] === 200) {
         if (data["get_all"] === true) {
             all_table(Object.values(data["data"]))
-            console.log("ВЫЗОВ")
         } else {
             generate_schedule_table(data)
         }
@@ -211,16 +209,16 @@ function generate_schedule_table(data) {
     <div class="tab-content" id="weeks-tabContent">`// 6 базовых кнопок в начале
     for (let i = 0; i <= 5; i++) {
         start += weekDay_title[i] // добавление начала нужной вкладки из констант
-        start += '<table class="table table-bordered"><thead><tr><th scope="col" id="time">№ Урока</th><th scope="col">Урок</th></tr></thead><tbody>' //Первая строчка таблицы №Урока и Урок
+        start += '<table class="table table-bordered" style="width: 96%; margin-left: 2%; margin-right: 2%;"><thead><tr><th id="time">№ Урока</th><th style="text-align: center;">Урок</th></tr></thead><tbody>' //Первая строчка таблицы №Урока и Урок
         timer = 0 // таймер для уроков(максимум 6)
         for (let element in data[Object.keys(data)[i]]) {// циклом проходимся по каждому двумерному списку словаря используя ключи строго от monday к saturday            
             let shablon = "" // в этом цикле создаем переменную шаблон для генерирования в ней самой таблицы каждого дня
-            shablon += `<tr><th scope="row" id="time">${time_lst[timer]}</th>`//прибавляем время
+            shablon += `<tr><th id="time">${time_lst[timer]}</th>`//прибавляем время
             timer += 1
             if (data[Object.keys(data)[i]][element][1] > 1) { // если высота строки больше 1
                 shablon += `<td rowspan="${data[Object.keys(data)[i]][element][1]}" style="vertical-align: middle;">${data[Object.keys(data)[i]][element][0]}</td></tr>` // задаем эту строку нужной высоты и добавляем стиль вертикального центрирования
                 while (data[Object.keys(data)[i]][element][1] > 1) { // надо добавить h-1 пустых строк, чтобы таблица не сломалась(h - высота строки)
-                    shablon += `<tr><th scope="row" id="time">${time_lst[timer]}</th></tr>`
+                    shablon += `<tr><th id="time">${time_lst[timer]}</th></tr>`
                     timer += 1 // В первом столбце всегда будет 6 рядов, поэтому каждый раз генерим новую строку для 1 столбца и увеличиваем таймер
                     data[Object.keys(data)[i]][element][1] -= 1
                 } // уменьшаем высоту уже выбранной строки, чтобы цикл не зациклился
@@ -235,7 +233,7 @@ function generate_schedule_table(data) {
     start += "</div>" // закрываем последний тег
     $('#main-page').append(start) //добавляем таблицу на страничку
     if (weekday != 0) {
-        console.log($(`#${week_pills[weekday]}`).tab('show'))
+        $(`#${week_pills[weekday]}`).tab('show')
     } else {
         $("#pills-Monday-tab").tab('show');
     }
@@ -253,7 +251,7 @@ function generate_courses_table(data) {
         `<div class="tab-pane fade${weekday == 6 ? "show active" : ""}" id="pills-Saturday" role="tabpanel" aria-labelledby="pill-Saturday-tab">`,
         `<div class="tab-pane fade${weekday == 0 ? "show active" : ""}" id="pills-Sunday" role="tabpanel" aria-labelledby="pill-Sunday-tab">`
     ];
-    code = `<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    code = `<ul class="nav nav-pills mb-3" style="padding-top: 10px" id="pills-tab" role="tablist">
     <li class="nav-item" role="presentation"><button class="${today.getDay() == 1 ? "nav-link active" : "nav-link"}" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"type="button" role="tab" aria-controls="Monday" aria-selected="${weekday == 1 ? "true" : "false"}">Пн</button></li>
     <li class="nav-item" role="presentation"><button class="${today.getDay() == 2 ? "nav-link active" : "nav-link"}" id="pills-Tuesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Tuesday" type="button"role="tab" aria-controls="week-Tuesday" aria-selected="${weekday == 2 ? "true" : "false"}">Вт</button></li>
     <li class="nav-item" role="presentation"><button class="${today.getDay() == 3 ? "nav-link active" : "nav-link"}" id="pills-Wednesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Wednesday"type="button" role="tab" aria-controls="week-Wednesday" aria-selected="${weekday == 3 ? "true" : "false"}">Ср</button></li>
@@ -263,7 +261,7 @@ function generate_courses_table(data) {
     <li class="nav-item" role="presentation"><button class="${today.getDay() == 0 ? "nav-link active" : "nav-link"}" id="pills-Sunday-tab" data-bs-toggle="pill" data-bs-target="#pills-Sunday" type="button" role="tab" aria-controls="week-Sunday" aria-selected="false${weekday == 0 ? "true" : "false"}">Вс</button></li></ul><div class="tab-content" id="weeks-tabContent">`
     for (let z = 0; z <= 6; z++) {
         code += weekDay_title[z];
-        code += '<table class="table table-bordered"><thead><tr><th scope="col" id="time">Время</th><th scope="col">Спец-курс</th></tr></thead><tbody>';
+        code += '<table class="table table-bordered" style="width: 96%; margin-left: 2%; margin-right: 2%;"><thead><tr><th  id="time">Время</th><th style="text-align: center;">Спец-курс</th></tr></thead><tbody>';
         lowerLevel = data[Object.keys(data)[z]]
         for (i in lowerLevel) {
             if (lowerLevel[i].length != 0) {
@@ -281,7 +279,20 @@ function generate_courses_table(data) {
 function all_table(data_lst) {
     $('#main-page').empty()
     let response_data = element_id.split(":")
+    let only_for_all = response_data[1].split("_")
     let weekday = today.getDay()
+    // Макс, я вот так достаю дочерние группы классов, оно работает, так что если не нравится
+    // перепиши, а я спать хочу.
+    let groups_names_str = ''
+    $( `#${response_data[1]} > li > a`).each( function( index, element) {
+
+       groups_names_str += `${$(element).attr( "id")} `
+    });
+    groups_names = groups_names_str.split(' ')
+    groups_names.shift()
+    groups_names.pop()
+    let gl = groups_names
+    
     let weekDay_title = [
         `<div class="tab-pane fade${weekday == 1 ? "show active" : ""}" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab">`,
         `<div class="tab-pane fade${weekday == 2 ? "show active" : ""}" id="pills-Tuesday" role="tabpanel" aria-labelledby="pill-Tuesday-tab">`,
@@ -291,6 +302,8 @@ function all_table(data_lst) {
         `<div class="tab-pane fade${weekday == 6 ? "show active" : ""}" id="pills-Saturday" role="tabpanel" aria-labelledby="pill-Saturday-tab">`
     ]
     let start = `
+    <p class="ml-3">${only_for_all[0]}-${only_for_all[1]} класс</p>
+    <hr>
     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
     <li class="nav-item" role="presentation">
     <button class="nav-link${weekday == 1 ? " active" : ""}" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"
@@ -316,33 +329,37 @@ function all_table(data_lst) {
     <button class="nav-link${weekday == 6 ? " active" : ""}" id="pills-Saturday-tab" data-bs-toggle="pill" data-bs-target="#pills-Saturday"
     type="button" role="tab" aria-controls="week-Saturday" aria-selected="${weekday == 6 ? "true" : "false"}">Сб</button>
     </li>
-    <p class="ml-3">${response_data[1].split("_")[0]}-${response_data[1].split("_")[1]} класс</p>
     </ul>
     <div class="tab-content" id="weeks-tabContent">`
     for (let i = 0; i <= 5; i++) {
-        for (single_tab in data_lst) {
             start += weekDay_title[i] // добавление начала нужной вкладки из констант
-            start += '<table class="table table-bordered"><thead><tr><th scope="col" id="time">№ Урока</th><th scope="col">Урок</th></tr></thead><tbody>' //Первая строчка таблицы №Урока и Урок
+            start += '<div class="container"><div class="row">'
+        for (let j = 0; j < data_lst.length; j++) {
+            let this_group = gl[j].split(':')[1]
+
+            start += `<div class="col"><p>${this_group} группа</p><table class="table table-bordered"><thead><tr><th  id="time">№ Урока</th><th style="text-align: center;">Урок</th></tr></thead><tbody>` //Первая строчка таблицы №Урока и Урок
             timer = 0 // таймер для уроков(максимум 6)
-            for (let element in single_tab[Object.keys(single_tab)[i]]) {// циклом проходимся по каждому двумерному списку словаря используя ключи строго от monday к saturday            
+            let data = data_lst[j]
+            for (let element in data[(Object.keys(data))[i]]) {// циклом проходимся по каждому двумерному списку словаря используя ключи строго от monday к saturday            
                 let shablon = "" // в этом цикле создаем переменную шаблон для генерирования в ней самой таблицы каждого дня
-                shablon += `<tr><th scope="row" id="time">${time_lst[timer]}</th>`//прибавляем время
+                shablon += `<tr><th  id="time">${time_lst[timer]}</th>`//прибавляем время
                 timer += 1
-                if (single_tab[Object.keys(single_tab)[i]][element][1] > 1) { // если высота строки больше 1
-                    shablon += `<td rowspan="${single_tab[Object.keys(single_tab)[i]][element][1]}" style="vertical-align: middle;">${single_tab[Object.keys(data)[i]][element][0]}</td></tr>` // задаем эту строку нужной высоты и добавляем стиль вертикального центрирования
-                    while (single_tab[Object.keys(single_tab)[i]][element][1] > 1) { // надо добавить h-1 пустых строк, чтобы таблица не сломалась(h - высота строки)
-                        shablon += `<tr><th scope="row" id="time">${time_lst[timer]}</th></tr>`
+                if (data[(Object.keys(data))[i]][element][1] > 1) { // если высота строки больше 1
+                    shablon += `<td rowspan="${data[(Object.keys(data))[i]][element][1]}" style="vertical-align: middle;">${data[(Object.keys(data))[i]][element][0]}</td></tr>` // задаем эту строку нужной высоты и добавляем стиль вертикального центрирования
+                    while (data[(Object.keys(data))[i]][element][1] > 1) { // надо добавить h-1 пустых строк, чтобы таблица не сломалась(h - высота строки)
+                        shablon += `<tr><th  id="time">${time_lst[timer]}</th></tr>`
                         timer += 1 // В первом столбце всегда будет 6 рядов, поэтому каждый раз генерим новую строку для 1 столбца и увеличиваем таймер
-                        single_tab[Object.keys(data)[i]][element][1] -= 1
+                        data[(Object.keys(data))[i]][element][1] -= 1
                     } // уменьшаем высоту уже выбранной строки, чтобы цикл не зациклился
                 }
                 else { // длинна строки может быть только 1, значит добавляем к шаблону f-строку с заданной высотой
-                    shablon += `<td rowspan="1">${single_tab[Object.keys(single_tab)[i]][element][0]}</td></tr>`
+                    shablon += `<td rowspan="1">${data[(Object.keys(data))[i]][element][0]}</td></tr>`
                 }
                 start += shablon // в конце прибавляем к start сморфированную таблицу
             }
+            start += "</tbody></table></div>" // закрываем все теги
         }
-        start += "</tbody></table></div>" // закрываем все теги
+        start+="</div></div></div>"
     }
     start += "</div>" // закрываем последний тег
     $('#main-page').append(start) //добавляем таблицу на страничку

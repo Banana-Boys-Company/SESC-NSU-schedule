@@ -78,7 +78,7 @@ if os.path.exists("data.json"):
             COURSES_DATA = json.load(f)
 else:
     if os.path.exists("data.xlsx"):
-        with open("data.json", "w") as f:
+        with open("data.json", "w", encoding="cp1251") as f:
             cashed_data, COURSES_DATA = parse_both_tables(bar_is_on=True)
             json.dump(cashed_data, fp=f, ensure_ascii=False)
         if os.path.exists("courses.json"):
@@ -90,7 +90,7 @@ else:
         except Exception:
             print(Exception)
         else:
-            with open("data.json", "w") as f:
+            with open("data.json", "w", encoding="cp1251") as f:
                 cashed_data, COURSES_DATA = parse_both_tables(bar_is_on=True)
                 json.dump(cashed_data, fp=f, ensure_ascii=False)
             if os.path.exists("courses.json"):
@@ -102,7 +102,7 @@ if os.path.exists("courses.json") and (COURSES_DATA == {}):
         COURSES_DATA = json.load(f)
 else:
     if os.path.exists("data.xlsx"):
-        with open("courses.json", "w") as f:
+        with open("courses.json", "w", encoding="cp1251") as f:
             COURSES_DATA = parse_both_tables(only_courses=True)
             json.dump(COURSES_DATA, fp=f, ensure_ascii=False)
     else:
@@ -111,7 +111,7 @@ else:
         except Exception:
             print(Exception)
         else:
-            with open("courses.json", "w") as f:
+            with open("courses.json", "w", encoding="cp1251") as f:
                 COURSES_DATA = parse_both_tables(only_courses=True)
                 json.dump(COURSES_DATA, fp=f, ensure_ascii=False)
 
