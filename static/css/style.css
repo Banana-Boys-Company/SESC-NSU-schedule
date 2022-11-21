@@ -18,6 +18,7 @@ html {
    border: solid #345d32;
    border-radius: 10px;
    text-align: center;
+   -webkit-text-size-adjust: 100px;
    text-size-adjust: 100px;
 }
 
@@ -47,6 +48,7 @@ html {
    .dropdown-menu>li:hover>.submenu {
       display: block;
    }
+
    #clock {
       font-size: 20px;
       text-align: center;
@@ -60,12 +62,14 @@ html {
       margin-right: 0.7rem;
       margin-bottom: .5rem;
    }
+
    .classbutton {
       margin-bottom: 3px;
    }
+
    #clock {
-   font-size: 16px;
-   text-align: center;
+      font-size: 16px;
+      text-align: center;
    }
 }
 
@@ -73,4 +77,12 @@ html {
 .carousel {
    width: 63.6%;
    margin-left: 15.9%;
+}
+
+.progress {
+   height: 2px !important;
+}
+
+.progress-bar {
+   width: 100%;
 }

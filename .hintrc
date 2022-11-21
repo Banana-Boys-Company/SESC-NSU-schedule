@@ -8,6 +8,15 @@
       {
         "aria-valid-attr-value": "off"
       }
-    ]
+    ],
+    "compat-api/css": [
+      "default",
+      {
+        "ignore": [
+          "text-size-adjust"
+        ]
+      }
+    ],
+    "no-inline-styles": "off"
   }
 }

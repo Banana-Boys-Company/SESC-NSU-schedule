@@ -11,6 +11,7 @@ var timer_ = setTimeout(function () {
 }, 100000)
 
 let element_id = ""
+let click = true
 
 var today = new Date();
 let weekday = today.getDate()
@@ -49,6 +50,50 @@ let time_lst = ["1(8:30)", "2(9:15)", "3(10:20)", "4(11:25)", "5(12:30)", "6(13:
 
 // Код после полной загрузки страницы
 $(document).ready(function () {
+    $(document).on("click", ".close-warning", function (el) {
+        let alert_message = $(this).parent(".alert");
+        alert_message.remove()
+    });
+
+    $(document).on("click", '.weekday-button', function (el) {
+        if (click == true) {
+            click = false;
+            buttonTimeOut();
+        } else {
+            let new_warning =
+                $(`<div class="alert alert-warning w-75 float-end align-items-center" id="timeout-alert">
+                    <svg class="bi flex-shrink-0 me-2" width="24" height="24">
+                        <use xlink:href="#warning" />
+                    </svg>
+                    <button type="button" class="close-warning float-end btn align-center" data-dismiss="alert">x</button>
+                    <strong class="">Предупреждение!</strong>
+                    <p class="text-start text-wrap">Подождите немного перед повторным использованием</p>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar progress-bar-striped progress-bar-animated"
+                            aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                </div>`)
+            $("#error-modal").append(new_warning)
+            $("#error-modal").children().slice(-1)[0]
+            $(".weekday-button").attr({ "aria-disabled": "true" }).addClass('disabled')
+            new_warning.fadeTo(2000, 500).slideUp(500, function () {
+                new_warning.slideUp(500);
+                new_warning.children(".progress")
+            });
+            let progressBar = $($($($("#error-modal").children().slice(-1)[0]).children(".progress")).children(".progress-bar"))
+            progressBar.animate({ width: "0%" }, 1500);
+            progressBar.delay(1000).fadeOut(500);
+        }
+
+    });
+    function buttonTimeOut() {
+        setTimeout(function () {
+            click = true;
+            $(".weekday-button").attr({ "aria-disabled": "false" }).removeClass('disabled')
+            console.log('Теперь можете нажимать')
+        }, 500)
+    };
     // Выбор группы класса
 
     $(".get-class").on("click", function (el) {
@@ -106,7 +151,7 @@ $(document).ready(function () {
         element.addEventListener('click', function (e) {
             e.stopPropagation();
         });
-    })
+    });
 
 
 
@@ -143,7 +188,7 @@ $(document).ready(function () {
             });
         })
     }
-})
+});
 
 
 
@@ -156,11 +201,11 @@ socket.on('schedule', data => {
             generate_schedule_table(data)
         }
     }
-})
+});
 
 socket.on('courses', data => {
     generate_courses_table(data)
-})
+});
 
 let week_pills = [null, "pills-Monday-tab", "pills-Tuesday-tab", "pills-Wednesday-tab", "pills-Thursday-tab", "pills-Friday-tab", "pills-Saturday-tab"]
 
@@ -182,27 +227,27 @@ function generate_schedule_table(data) {
     <hr>
     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
     <li class="nav-item" role="presentation">
-    <button class="nav-link${weekday == 1 ? " active" : ""}" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"
+    <button class="weekday-button nav-link${weekday == 1 ? " active" : ""}" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"
     type="button" role="tab" aria-controls="Monday" aria-selected="${weekday == 1 ? "true" : "false"}">Пн</button>
     </li>
     <li class="nav-item" role="presentation">
-    <button class="nav-link${weekday == 2 ? " active" : ""}" id="pills-Tuesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Tuesday" type="button"
+    <button class="weekday-button nav-link${weekday == 2 ? " active" : ""}" id="pills-Tuesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Tuesday" type="button"
     role="tab" aria-controls="week-Tuesday" aria-selected="${weekday == 2 ? "true" : "false"}">Вт</button>
     </li>
     <li class="nav-item" role="presentation">
-    <button class="nav-link${weekday == 3 ? " active" : ""}" id="pills-Wednesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Wednesday"
+    <button class="weekday-button nav-link${weekday == 3 ? " active" : ""}" id="pills-Wednesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Wednesday"
     type="button" role="tab" aria-controls="week-Wednesday" aria-selected="${weekday == 3 ? "true" : "false"}">Ср</button>
     </li>
     <li class="nav-item" role="presentation">
-    <button class="nav-link${weekday == 4 ? " active" : ""}" id="pills-Thursday-tab" data-bs-toggle="pill" data-bs-target="#pills-Thursday"
+    <button class="weekday-button nav-link${weekday == 4 ? " active" : ""}" id="pills-Thursday-tab" data-bs-toggle="pill" data-bs-target="#pills-Thursday"
     type="button" role="tab" aria-controls="week-Thursday" aria-selected="${weekday == 4 ? "true" : "false"}">Чт</button>
     </li>
     <li class="nav-item" role="presentation">
-    <button class="nav-link${weekday == 5 ? " active" : ""}" id="pills-Friday-tab" data-bs-toggle="pill" data-bs-target="#pills-Friday" type="button"
+    <button class="weekday-button nav-link${weekday == 5 ? " active" : ""}" id="pills-Friday-tab" data-bs-toggle="pill" data-bs-target="#pills-Friday" type="button"
     role="tab" aria-controls="week-Friday" aria-selected="${weekday == 5 ? "true" : "false"}">Пт</button>
     </li>
     <li class="nav-item" role="presentation">
-    <button class="nav-link${weekday == 6 ? " active" : ""}" id="pills-Saturday-tab" data-bs-toggle="pill" data-bs-target="#pills-Saturday"
+    <button class="weekday-button nav-link${weekday == 6 ? " active" : ""}" id="pills-Saturday-tab" data-bs-toggle="pill" data-bs-target="#pills-Saturday"
     type="button" role="tab" aria-controls="week-Saturday" aria-selected="${weekday == 6 ? "true" : "false"}">Сб</button>
     </li>
     </ul>
@@ -252,13 +297,13 @@ function generate_courses_table(data) {
         `<div class="tab-pane fade${weekday == 0 ? "show active" : ""}" id="pills-Sunday" role="tabpanel" aria-labelledby="pill-Sunday-tab">`
     ];
     code = `<ul class="nav nav-pills mb-3" style="padding-top: 10px" id="pills-tab" role="tablist">
-    <li class="nav-item" role="presentation"><button class="${today.getDay() == 1 ? "nav-link active" : "nav-link"}" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"type="button" role="tab" aria-controls="Monday" aria-selected="${weekday == 1 ? "true" : "false"}">Пн</button></li>
-    <li class="nav-item" role="presentation"><button class="${today.getDay() == 2 ? "nav-link active" : "nav-link"}" id="pills-Tuesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Tuesday" type="button"role="tab" aria-controls="week-Tuesday" aria-selected="${weekday == 2 ? "true" : "false"}">Вт</button></li>
-    <li class="nav-item" role="presentation"><button class="${today.getDay() == 3 ? "nav-link active" : "nav-link"}" id="pills-Wednesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Wednesday"type="button" role="tab" aria-controls="week-Wednesday" aria-selected="${weekday == 3 ? "true" : "false"}">Ср</button></li>
-    <li class="nav-item" role="presentation"><button class="${today.getDay() == 4 ? "nav-link active" : "nav-link"}" id="pills-Thursday-tab" data-bs-toggle="pill" data-bs-target="#pills-Thursday"type="button" role="tab" aria-controls="week-Thursday" aria-selected="false${weekday == 5 ? "true" : "false"}">Чт</button></li>
-    <li class="nav-item" role="presentation"><button class="${today.getDay() == 5 ? "nav-link active" : "nav-link"}" id="pills-Friday-tab" data-bs-toggle="pill" data-bs-target="#pills-Friday" type="button"role="tab" aria-controls="week-Friday" aria-selected="${weekday == 6 ? "true" : "false"}">Пт</button></li>
-    <li class="nav-item" role="presentation"><button class="${today.getDay() == 6 ? "nav-link active" : "nav-link"}" id="pills-Saturday-tab" data-bs-toggle="pill" data-bs-target="#pills-Saturday"type="button" role="tab" aria-controls="week-Saturday" aria-selected="${weekday == 0 ? "true" : "false"}">Сб</button></li>
-    <li class="nav-item" role="presentation"><button class="${today.getDay() == 0 ? "nav-link active" : "nav-link"}" id="pills-Sunday-tab" data-bs-toggle="pill" data-bs-target="#pills-Sunday" type="button" role="tab" aria-controls="week-Sunday" aria-selected="false${weekday == 0 ? "true" : "false"}">Вс</button></li></ul><div class="tab-content" id="weeks-tabContent">`
+    <li class="nav-item" role="presentation"><button class="weekday-button nav-link${today.getDay() == 1 ? " active" : ""}" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"type="button" role="tab" aria-controls="Monday" aria-selected="${weekday == 1 ? "true" : "false"}">Пн</button></li>
+    <li class="nav-item" role="presentation"><button class="weekday-button nav-link${today.getDay() == 2 ? " active" : ""}" id="pills-Tuesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Tuesday" type="button"role="tab" aria-controls="week-Tuesday" aria-selected="${weekday == 2 ? "true" : "false"}">Вт</button></li>
+    <li class="nav-item" role="presentation"><button class="weekday-button nav-link${today.getDay() == 3 ? " active" : ""}" id="pills-Wednesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Wednesday"type="button" role="tab" aria-controls="week-Wednesday" aria-selected="${weekday == 3 ? "true" : "false"}">Ср</button></li>
+    <li class="nav-item" role="presentation"><button class="weekday-button nav-link${today.getDay() == 4 ? " active" : ""}" id="pills-Thursday-tab" data-bs-toggle="pill" data-bs-target="#pills-Thursday"type="button" role="tab" aria-controls="week-Thursday" aria-selected="false${weekday == 5 ? "true" : "false"}">Чт</button></li>
+    <li class="nav-item" role="presentation"><button class="weekday-button nav-link${today.getDay() == 5 ? " active" : ""}" id="pills-Friday-tab" data-bs-toggle="pill" data-bs-target="#pills-Friday" type="button"role="tab" aria-controls="week-Friday" aria-selected="${weekday == 6 ? "true" : "false"}">Пт</button></li>
+    <li class="nav-item" role="presentation"><button class="weekday-button nav-link${today.getDay() == 6 ? " active" : ""}" id="pills-Saturday-tab" data-bs-toggle="pill" data-bs-target="#pills-Saturday"type="button" role="tab" aria-controls="week-Saturday" aria-selected="${weekday == 0 ? "true" : "false"}">Сб</button></li>
+    <li class="nav-item" role="presentation"><button class="weekday-button nav-link${today.getDay() == 0 ? " active" : ""}" id="pills-Sunday-tab" data-bs-toggle="pill" data-bs-target="#pills-Sunday" type="button" role="tab" aria-controls="week-Sunday" aria-selected="false${weekday == 0 ? "true" : "false"}">Вс</button></li></ul><div class="tab-content" id="weeks-tabContent">`
     for (let z = 0; z <= 6; z++) {
         code += weekDay_title[z];
         code += '<table class="table table-bordered" style="width: 96%; margin-left: 2%; margin-right: 2%;"><thead><tr><th  id="time">Время</th><th style="text-align: center;">Спец-курс</th></tr></thead><tbody>';
@@ -275,7 +320,7 @@ function generate_courses_table(data) {
     }
     code += "</div>"
     $('#main-page').append(code)
-}
+};
 function all_table(data_lst) {
     $('#main-page').empty()
     let response_data = element_id.split(":")
@@ -284,15 +329,15 @@ function all_table(data_lst) {
     // Макс, я вот так достаю дочерние группы классов, оно работает, так что если не нравится
     // перепиши, а я спать хочу.
     let groups_names_str = ''
-    $( `#${response_data[1]} > li > a`).each( function( index, element) {
+    $(`#${response_data[1]} > li > a`).each(function (index, element) {
 
-       groups_names_str += `${$(element).attr( "id")} `
+        groups_names_str += `${$(element).attr("id")} `
     });
     groups_names = groups_names_str.split(' ')
     groups_names.shift()
     groups_names.pop()
     let gl = groups_names
-    
+
     let weekDay_title = [
         `<div class="tab-pane fade${weekday == 1 ? "show active" : ""}" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab">`,
         `<div class="tab-pane fade${weekday == 2 ? "show active" : ""}" id="pills-Tuesday" role="tabpanel" aria-labelledby="pill-Tuesday-tab">`,
@@ -306,34 +351,34 @@ function all_table(data_lst) {
     <hr>
     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
     <li class="nav-item" role="presentation">
-    <button class="nav-link${weekday == 1 ? " active" : ""}" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"
+    <button class="weekday-button nav-link${weekday == 1 ? " active" : ""}" id="pills-Monday-tab" data-bs-toggle="pill" data-bs-target="#pills-Monday"
     type="button" role="tab" aria-controls="Monday" aria-selected="${weekday == 1 ? "true" : "false"}">Пн</button>
     </li>
     <li class="nav-item" role="presentation">
-    <button class="nav-link${weekday == 2 ? " active" : ""}" id="pills-Tuesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Tuesday" type="button"
+    <button class="weekday-button nav-link${weekday == 2 ? " active" : ""}" id="pills-Tuesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Tuesday" type="button"
     role="tab" aria-controls="week-Tuesday" aria-selected="${weekday == 2 ? "true" : "false"}">Вт</button>
     </li>
     <li class="nav-item" role="presentation">
-    <button class="nav-link${weekday == 3 ? " active" : ""}" id="pills-Wednesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Wednesday"
+    <button class="weekday-button nav-link${weekday == 3 ? " active" : ""}" id="pills-Wednesday-tab" data-bs-toggle="pill" data-bs-target="#pills-Wednesday"
     type="button" role="tab" aria-controls="week-Wednesday" aria-selected="${weekday == 3 ? "true" : "false"}">Ср</button>
     </li>
     <li class="nav-item" role="presentation">
-    <button class="nav-link${weekday == 4 ? " active" : ""}" id="pills-Thursday-tab" data-bs-toggle="pill" data-bs-target="#pills-Thursday"
+    <button class="weekday-button nav-link${weekday == 4 ? " active" : ""}" id="pills-Thursday-tab" data-bs-toggle="pill" data-bs-target="#pills-Thursday"
     type="button" role="tab" aria-controls="week-Thursday" aria-selected="${weekday == 4 ? "true" : "false"}">Чт</button>
     </li>
     <li class="nav-item" role="presentation">
-    <button class="nav-link${weekday == 5 ? " active" : ""}" id="pills-Friday-tab" data-bs-toggle="pill" data-bs-target="#pills-Friday" type="button"
+    <button class="weekday-button nav-link${weekday == 5 ? " active" : ""}" id="pills-Friday-tab" data-bs-toggle="pill" data-bs-target="#pills-Friday" type="button"
     role="tab" aria-controls="week-Friday" aria-selected="${weekday == 5 ? "true" : "false"}">Пт</button>
     </li>
     <li class="nav-item" role="presentation">
-    <button class="nav-link${weekday == 6 ? " active" : ""}" id="pills-Saturday-tab" data-bs-toggle="pill" data-bs-target="#pills-Saturday"
+    <button class="weekday-button nav-link${weekday == 6 ? " active" : ""}" id="pills-Saturday-tab" data-bs-toggle="pill" data-bs-target="#pills-Saturday"
     type="button" role="tab" aria-controls="week-Saturday" aria-selected="${weekday == 6 ? "true" : "false"}">Сб</button>
     </li>
     </ul>
     <div class="tab-content" id="weeks-tabContent">`
     for (let i = 0; i <= 5; i++) {
-            start += weekDay_title[i] // добавление начала нужной вкладки из констант
-            start += '<div class="container"><div class="row">'
+        start += weekDay_title[i] // добавление начала нужной вкладки из констант
+        start += '<div class="container"><div class="row">'
         for (let j = 0; j < data_lst.length; j++) {
             let this_group = gl[j].split(':')[1]
 
@@ -359,12 +404,11 @@ function all_table(data_lst) {
             }
             start += "</tbody></table></div>" // закрываем все теги
         }
-        start+="</div></div></div>"
+        start += "</div></div></div>"
     }
     start += "</div>" // закрываем последний тег
     $('#main-page').append(start) //добавляем таблицу на страничку
-
-}
+};
 
 let weekday_string = ["Вс", "Пн.", "Вт.", "Ср.", "Чт.", "Пт.", "Сб."]
 
@@ -389,5 +433,4 @@ function timeCount() {
         day + "/" + month + "/" + year + " | " + hour + ":" + minute + ":" + second + ` (${weekday_string[today.getDay()]})`;
 
     setTimeout("timeCount()", 1000);
-}
-
+};
