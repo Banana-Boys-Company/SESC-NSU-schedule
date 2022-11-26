@@ -83,7 +83,7 @@ $(document).ready(function () {
             });
             let progressBar = $($($($("#error-modal").children().slice(-1)[0]).children(".progress")).children(".progress-bar"))
             progressBar.animate({ width: "0%" }, 1500);
-            progressBar.delay(1000).fadeOut(500);
+            progressBar.delay(1000).fadeOut(250);
         }
 
     });
