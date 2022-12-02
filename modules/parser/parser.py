@@ -210,7 +210,7 @@ class ScheduleParser:
         for i, column in enumerate(ws.iter_cols(min_col=1, max_col=8, min_row=1, max_row=84)):
             column: list[openpyxl.cell.Cell]
             if i == 0:
-                departments = list(column[:])
+                departments = list(column[1:])
                 continue
             if i == 1:
                 times = column[1:]
