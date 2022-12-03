@@ -33,10 +33,9 @@ API_SESSION = {}
 VALID_CLASSES = ["9_1", "9_2", "10_1", "10_2", "10_3", "10_4", "10_5", "10_6", "10_7", "10_8",
                  "11_1", "11_2", "11_3", "11_4", "11_5", "11_6", "11_7", "11_8", "11_9", "11_10", "11_11" "11_12"]
 
-parser = pars.ScheduleParser('data.xlsx')
-
 
 def parse_both_tables(bar_is_on=False, only_courses=False):
+    parser = pars.ScheduleParser('data.xlsx')
     if only_courses is True:
         dict3 = parser.parse_cources("СПЕЦКУРСЫ")
         return dict3
@@ -139,17 +138,22 @@ def update_banner_data():
         is_online = None
         try:
             files = os.listdir("\\\\WHITEEVILBRO-LA\Share")
-            is_online = True
         except FileNotFoundError:
             files = os.listdir(f"{os.getcwd()}\\static\\images\\banner")
             is_online = False
-        files = [f"images/banner/{element}" for element in files]
+        else:
+            is_online = True
+        files = [f"images/banner/{element}" for element in files if element.split(
+            ".")[-1] in ["png", "jpeg", "webm", "gif", "jpg"]]
         for file in BANNER_DATA["new_data"]:
             if file not in files:
                 if file not in BANNER_DATA["old_data"]:
                     BANNER_DATA["old_data"].append(files)
-                os.remove("{}\\static\\{}".format(
-                    os.getcwd(), file.replace("/", "\\")))
+                try:
+                    os.remove("{}\\static\\{}".format(
+                        os.getcwd(), file.replace("/", "\\")))
+                except:
+                    pass
         if is_online is True:
             for file in files:
                 if file not in BANNER_DATA["new_data"]:

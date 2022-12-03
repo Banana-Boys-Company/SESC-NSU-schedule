@@ -15,7 +15,7 @@ class Handler(PatternMatchingEventHandler):
 
 
 event_handler = Handler(
-    patterns=['*.jpg', '*.png', '*.gif', '*.webm'],
+    patterns=['*.jpg', '*.png', '*.gif', '*.webm', '*.jpeg'],
     ignore_patterns=[],
     ignore_directories=True,
     case_sensitive=False
