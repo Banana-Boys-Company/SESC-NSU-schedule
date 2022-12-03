@@ -306,12 +306,22 @@ function generate_courses_table(data) {
     <li class="nav-item" role="presentation"><button class="weekday-button nav-link${today.getDay() == 0 ? " active" : ""}" id="pills-Sunday-tab" data-bs-toggle="pill" data-bs-target="#pills-Sunday" type="button" role="tab" aria-controls="week-Sunday" aria-selected="false${weekday == 0 ? "true" : "false"}">Вс</button></li></ul><div class="tab-content" id="weeks-tabContent">`
     for (let z = 0; z <= 6; z++) {
         code += weekDay_title[z];
-        code += '<table class="table table-bordered" style="width: 96%; margin-left: 2%; margin-right: 2%;"><thead><tr><th  id="time">Время</th><th style="text-align: center;">Спец-курс</th></tr></thead><tbody>';
         lowerLevel = data[Object.keys(data)[z]]
+    }
+    let tracker = 0
+    for (check in lowerLevel) {
+        if (lowerLevel[check].length == 0) {
+            tracker ++;
+        } 
+        if (lowerLevel == undefined || tracker == 4) {
+            code += '<h1 style="text-align: center;">Тут еще нет расписания :(</h1>'
+            continue
+        }
+        code += '<table class="table table-bordered" style="width: 96%; margin-left: 2%; margin-right: 2%;"><thead><tr><th  id="time">Время</th><th style="text-align: center;">Спец-курс</th></tr></thead><tbody>';
         for (i in lowerLevel) {
             if (lowerLevel[i].length != 0) {
-                code += `<tr><th rowspan="${lowerLevel[i].length + 1}">${i}</th><td>${lowerLevel[i][0]}</td></tr>`;
-                for (let j = 0; j <= lowerLevel[i].length - 1; j++) {
+                code += `<tr><th rowspan="${lowerLevel[i].length + 1}">${i}</th></tr>`;
+                for (let j = 0; j <= lowerLevel[i].length-1; j++) {
                     code += `<tr><td>${lowerLevel[i][j]}</td></tr>`;
                 }
             }
