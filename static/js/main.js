@@ -82,8 +82,8 @@ $(document).ready(function () {
                 new_warning.children(".progress")
             });
             let progressBar = $($($($("#error-modal").children().slice(-1)[0]).children(".progress")).children(".progress-bar"))
-            progressBar.animate({ width: "0%" }, 1500);
-            progressBar.delay(1000).fadeOut(250);
+            progressBar.animate({ width: "0%" }, 500);
+            progressBar.delay(500).fadeOut(500);
         }
 
     });
@@ -91,7 +91,6 @@ $(document).ready(function () {
         setTimeout(function () {
             click = true;
             $(".weekday-button").attr({ "aria-disabled": "false" }).removeClass('disabled')
-            console.log('Теперь можете нажимать')
         }, 500)
     };
     // Выбор группы класса
@@ -307,13 +306,7 @@ function generate_courses_table(data) {
     for (let z = 0; z <= 6; z++) {
         code += weekDay_title[z];
         lowerLevel = data[Object.keys(data)[z]]
-    }
-    let tracker = 0
-    for (check in lowerLevel) {
-        if (lowerLevel[check].length == 0) {
-            tracker ++;
-        } 
-        if (lowerLevel == undefined || tracker == 4) {
+        if (lowerLevel == undefined) {
             code += '<h1 style="text-align: center;">Тут еще нет расписания :(</h1>'
             continue
         }

@@ -53,6 +53,9 @@ html {
       font-size: 20px;
       text-align: center;
    }
+   .carousel {
+      width: 63.3%;
+      margin-left: 16.2%;
 }
 
 /*Для мобилок */
@@ -74,10 +77,6 @@ html {
 }
 
 
-.carousel {
-   width: 63.6%;
-   margin-left: 15.9%;
-}
 
 .progress {
    height: 2px !important;
