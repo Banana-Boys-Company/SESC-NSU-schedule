@@ -134,7 +134,7 @@ try:
 except FileNotFoundError:
     BANNER_DATA = {"new_data": [f"images/banner/{element}" for element in os.listdir(
         PROJECT_ROOT + "/static/images/banner")], "old_data": [], "filenames": os.listdir(
-        "static/images/banner/")}
+        PROJECT_ROOT + "/static/images/banner")}
 
 
 for item in BANNER_DATA["new_data"]:
@@ -154,7 +154,7 @@ def update_banner_data():
             is_online = False
         else:
             is_online = True
-        files = [PROJECT_ROOT + f"/images/banner/{element}" for element in files if element.endswith(
+        files = [f"images/banner/{element}" for element in files if element.endswith(
             (".png", ".jpeg", ".jpg", ".gif", ".webm"))]
         for file in BANNER_DATA["new_data"]:
             if file not in files:
