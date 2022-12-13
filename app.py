@@ -25,7 +25,6 @@ socketio = SocketIO(app)
 logging.basicConfig(filename='output_log.log')
 
 SCRIPT_ROOT = pathlib.Path(__file__).parent.resolve()
-print(SCRIPT_ROOT)
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 logging.info(msg=f"ROOT директория: {PROJECT_ROOT}")
 DATABASE = os.path.join(PROJECT_ROOT, 'data', 'database.db')
@@ -154,8 +153,10 @@ def update_banner_data():
             is_online = False
         else:
             is_online = True
+        print("files", files)
         files = [f"images/banner/{element}" for element in files if element.endswith(
             (".png", ".jpeg", ".jpg", ".gif", ".webm"))]
+        print("adter", files)
         for file in BANNER_DATA["new_data"]:
             if file not in files:
                 if file not in BANNER_DATA["old_data"]:
@@ -170,6 +171,7 @@ def update_banner_data():
                 if file not in BANNER_DATA["new_data"]:
                     filename = file.split("/")[-1]
                     if filename not in os.listdir(PROJECT_ROOT + f"/static/images/banner"):
+                        print(os.listdir(PROJECT_ROOT + f"/static/images/banner"))
                         shutil.copyfile(
                             f"/mnt/sesc-share/background/{filename}", PROJECT_ROOT + f"/static/images/banner/{filename}")
         BANNER_DATA["new_data"] = deepcopy(files)
@@ -253,7 +255,6 @@ def close_connection(exception):
 @app.route("/")
 def index():
     socketio.start_background_task(update_banner_data)
-    print(BANNER_DATA["new_data"])
     return render_template("table.html", banner_links=BANNER_DATA["new_data"])
 
 # admin token --> O4ymBcTmiAFVIop17RLc57sDf4lW3RBkWdyZpC-6MZ8
