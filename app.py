@@ -4,10 +4,12 @@ from flask import Flask, render_template, url_for, request, jsonify, g
 from apscheduler.schedulers.background import BackgroundScheduler
 from modules.parser.common import department_to_id
 from flask_socketio import SocketIO, emit
+from copy import deepcopy
 import modules.parser.parser as pars
+import logging
 import urllib.request
 import json
-import os.path
+import os
 import shutil
 import urllib.parse
 import eventlet
@@ -19,12 +21,15 @@ app.config['SECRET_KEY'] = '&85e8hE1%J2&eH(D*E8i2v)5DoquH*)D'
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data/database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 socketio = SocketIO(app)
+logging.basicConfig(filename='loggs.log', level=logging.BASIC_FORMAT)
 
 
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
+logging.info(msg=f"ROOT директория: {PROJECT_ROOT}")
 DATABASE = os.path.join(PROJECT_ROOT, 'data', 'database.db')
 EXEL_TABLE_URL = "https://docs.google.com/spreadsheets/u/1/d/e/2PACX-1vQdS9Qd6cdKjcvTefM_PaaODSfpkpk55Zl2g4QxBVpKkUJsU1U08wKXdi6cSkNBAQ/pub?output=xlsx"
 API_VERSION = ["1"]
+logging.info(msg="Версии API: {}".format(", ".join(API_VERSION)))
 CLIENTS = []
 COURSES_DATA = {}
 API_ADMIN_LOGIN = "admin"
@@ -35,6 +40,7 @@ VALID_CLASSES = ["9_1", "9_2", "10_1", "10_2", "10_3", "10_4", "10_5", "10_6", "
 
 
 def parse_both_tables(bar_is_on=False, only_courses=False):
+    logging.log(msg="Начало парсинга обеих таблиц...")
     parser = pars.ScheduleParser('data.xlsx')
     if only_courses is True:
         dict3 = parser.parse_cources("СПЕЦКУРСЫ")
@@ -46,6 +52,7 @@ def parse_both_tables(bar_is_on=False, only_courses=False):
     full_dict = merge_dicts(dict1, dict2)
     dict3 = parser.parse_cources("СПЕЦКУРСЫ")
     del dict1, dict2
+    logging.log(msg="Успешный парсинг!")
     return full_dict, dict3
 
 
@@ -69,48 +76,50 @@ with app.app_context():
         "SELECT token FROM api WHERE permission=100", one=True)["token"]
 
 # Server data initialization
-if os.path.exists("data.json"):
-    with open('data.json', "r", encoding="cp1251") as f:
+if os.path.exists(PROJECT_ROOT + "/data.json"):
+    with open(PROJECT_ROOT + '/data.json', "r", encoding="cp1251") as f:
         cashed_data = json.load(f)
-    if os.path.exists("courses.json"):
-        with open('courses.json', "r", encoding="cp1251") as f:
+    if os.path.exists(PROJECT_ROOT + "/courses.json"):
+        with open(PROJECT_ROOT + '/courses.json', "r", encoding="cp1251") as f:
             COURSES_DATA = json.load(f)
 else:
-    if os.path.exists("data.xlsx"):
-        with open("data.json", "w", encoding="cp1251") as f:
+    if os.path.exists(PROJECT_ROOT + "/data.xlsx"):
+        with open(PROJECT_ROOT + "/data.json", "w", encoding="cp1251") as f:
             cashed_data, COURSES_DATA = parse_both_tables(bar_is_on=True)
             json.dump(cashed_data, fp=f, ensure_ascii=False)
-        if os.path.exists("courses.json"):
-            with open('courses.json', "r", encoding="cp1251") as f:
+        if os.path.exists(PROJECT_ROOT + "/courses.json"):
+            with open(PROJECT_ROOT + '/courses.json', "r", encoding="cp1251") as f:
                 json.dump(COURSES_DATA, fp=f, ensure_ascii=False)
     else:
         try:
-            urllib.request.urlretrieve(EXEL_TABLE_URL, "data.xlsx")
+            urllib.request.urlretrieve(
+                EXEL_TABLE_URL, PROJECT_ROOT + "/data.xlsx")
         except Exception:
             print(Exception)
         else:
-            with open("data.json", "w", encoding="cp1251") as f:
+            with open(PROJECT_ROOT + "/data.json", "w", encoding="cp1251") as f:
                 cashed_data, COURSES_DATA = parse_both_tables(bar_is_on=True)
                 json.dump(cashed_data, fp=f, ensure_ascii=False)
-            if os.path.exists("courses.json"):
-                with open('courses.json', "r", encoding="cp1251") as f:
+            if os.path.exists(PROJECT_ROOT + "/courses.json"):
+                with open(PROJECT_ROOT + '/courses.json', "r", encoding="cp1251") as f:
                     json.dump(COURSES_DATA, fp=f, ensure_ascii=False)
 
-if os.path.exists("courses.json") and (COURSES_DATA == {}):
-    with open('courses.json', "r", encoding="cp1251") as f:
+if os.path.exists(PROJECT_ROOT + "/courses.json") and (COURSES_DATA == {}):
+    with open(PROJECT_ROOT + '/courses.json', "r", encoding="cp1251") as f:
         COURSES_DATA = json.load(f)
 else:
-    if os.path.exists("data.xlsx"):
-        with open("courses.json", "w", encoding="cp1251") as f:
+    if os.path.exists(PROJECT_ROOT + "/data.xlsx"):
+        with open(PROJECT_ROOT + "/courses.json", "w", encoding="cp1251") as f:
             COURSES_DATA = parse_both_tables(only_courses=True)
             json.dump(COURSES_DATA, fp=f, ensure_ascii=False)
     else:
         try:
-            urllib.request.urlretrieve(EXEL_TABLE_URL, "data.xlsx")
+            urllib.request.urlretrieve(
+                EXEL_TABLE_URL, PROJECT_ROOT + "/data.xlsx")
         except Exception:
             print(Exception)
         else:
-            with open("courses.json", "w", encoding="cp1251") as f:
+            with open(PROJECT_ROOT + "/courses.json", "w", encoding="cp1251") as f:
                 COURSES_DATA = parse_both_tables(only_courses=True)
                 json.dump(COURSES_DATA, fp=f, ensure_ascii=False)
 
@@ -118,72 +127,72 @@ else:
 # Banner initialization
 try:
     BANNER_DATA = {"new_data": [f"images/banner/{element}" for element in os.listdir(
-        "\\\\WHITEEVILBRO-LA\Share")], "old_data": [], "filenames": os.listdir(
-        "\\\\WHITEEVILBRO-LA\Share")}
+        "/mnt/sesc-share/background") if element.endswith((".png", ".jpeg", ".jpg", ".gif", ".webm"))], "old_data": [], "filenames": os.listdir(
+        "/mnt/sesc-share/background")}
 except FileNotFoundError:
     BANNER_DATA = {"new_data": [f"images/banner/{element}" for element in os.listdir(
-        "static\\images\\banner\\")], "old_data": [], "filenames": os.listdir(
-        "static\\images\\banner\\")}
+        PROJECT_ROOT + "/static/images/banner")], "old_data": [], "filenames": os.listdir(
+        "static/images/banner/")}
 
 
 for item in BANNER_DATA["new_data"]:
     filename = item.split("/")[-1]
-    if filename not in os.listdir(f"{os.getcwd()}\\static\\images\\banner"):
+    if filename not in os.listdir(PROJECT_ROOT + "/static/images/banner"):
         shutil.copyfile(
-            f"//WHITEEVILBRO-LA/Share/{filename}", "{}\\static\\{}".format(os.getcwd(), item.replace("/", "\\")))
+            f"/mnt/sesc-share/background/{filename}", PROJECT_ROOT + "/static/{}".format(item))
 
 
 def update_banner_data():
     while True:
         is_online = None
         try:
-            files = os.listdir("\\\\WHITEEVILBRO-LA\Share")
+            files = os.listdir("/mnt/sesc-share/background")
         except FileNotFoundError:
-            files = os.listdir(f"{os.getcwd()}\\static\\images\\banner")
+            files = os.listdir(PROJECT_ROOT + "/static/images/banner")
             is_online = False
         else:
             is_online = True
-        files = [f"images/banner/{element}" for element in files if element.split(
-            ".")[-1] in ["png", "jpeg", "webm", "gif", "jpg"]]
+        files = [PROJECT_ROOT + f"/images/banner/{element}" for element in files if element.endswith(
+            (".png", ".jpeg", ".jpg", ".gif", ".webm"))]
         for file in BANNER_DATA["new_data"]:
             if file not in files:
                 if file not in BANNER_DATA["old_data"]:
                     BANNER_DATA["old_data"].append(files)
                 try:
-                    os.remove("{}\\static\\{}".format(
-                        os.getcwd(), file.replace("/", "\\")))
-                except:
-                    pass
+                    os.remove(PROJECT_ROOT + f"/static/{file}")
+                except Exception as exp:
+                    logging.error(
+                        f"Ошибка при обновлении списка изображений: {exp}")
         if is_online is True:
             for file in files:
                 if file not in BANNER_DATA["new_data"]:
                     filename = file.split("/")[-1]
-                    if filename not in os.listdir(f"{os.getcwd()}\\static\\images\\banner"):
-                        a = shutil.copyfile(
-                            f"//WHITEEVILBRO-LA/Share/{filename}", "{}\\static\\{}".format(os.getcwd(), file.replace("/", "\\")))
-        BANNER_DATA["new_data"] = files
-        new_data = BANNER_DATA.copy()
+                    if filename not in os.listdir(PROJECT_ROOT + f"/static/images/banner"):
+                        shutil.copyfile(
+                            f"/mnt/sesc-share/background/{filename}", PROJECT_ROOT + f"/static/{file}")
+        BANNER_DATA["new_data"] = deepcopy(files)
+        new_data = deepcopy(BANNER_DATA)
         new_data["new_data"] = [urllib.parse.quote_plus(item).replace(r"%2F", "/")
-                                for item in BANNER_DATA.copy()["new_data"]]
+                                for item in BANNER_DATA["new_data"]]
         socketio.emit('response-banner', new_data)
         eventlet.sleep(10)
 
 
 def update_schedule_json_data():
-    print("Start updating data...")
+    logging.log("Начало обновления exel данных...")
     global cashed_data
     global COURSES_DATA
     try:
         urllib.request.urlretrieve(EXEL_TABLE_URL, "data.xlsx")
     except Exception:
-        print("Downloading error, trying to open json data...")
-        with open('data.json', "r", encoding="cp1251") as f:
+        logging.warn("Ошибка установки таблицы, использованы локальные данные")
+        with open(PROJECT_ROOT + '/data.json', "r", encoding="cp1251") as f:
             cashed_data = json.load(f)
             COURSES_DATA = parse_both_tables(only_courses=True)
-        print("JSON data was loaded!")
+        logging.log("Локальные JSON загружены")
     else:
         cashed_data, COURSES_DATA = parse_both_tables(bar_is_on=True)
-    print("Data updated!")
+    logging.log("Exel данные обновлены!")
 
 
 scheduler = BackgroundScheduler()
@@ -321,5 +330,5 @@ eventlet.spawn(update_banner_data)
 
 if __name__ == '__main__':
     scheduler.start()
-    socketio.run(app, port=80, host="127.0.0.1", debug=True,
+    socketio.run(app, port=1735, host="0.0.0.0", debug=True,
                  reloader_options={"reloader_type": 'stat'})

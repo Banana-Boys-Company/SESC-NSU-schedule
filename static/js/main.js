@@ -1,7 +1,7 @@
 // [^-^]Hikaru#7106 - лучший кодер в мире
 
 // Подсоединение к сокет серверу бэка
-const socket = io.connect("http://127.0.0.1:80")
+const socket = io.connect("http://10.100.1.39:1735")
 
 // Таймер неактивности, поистечению 5 минут перезагрузка
 var timer_ = setTimeout(function () {
@@ -314,7 +314,7 @@ function generate_courses_table(data) {
         for (i in lowerLevel) {
             if (lowerLevel[i].length != 0) {
                 code += `<tr><th rowspan="${lowerLevel[i].length + 1}">${i}</th></tr>`;
-                for (let j = 0; j <= lowerLevel[i].length-1; j++) {
+                for (let j = 0; j <= lowerLevel[i].length - 1; j++) {
                     code += `<tr><td>${lowerLevel[i][j]}</td></tr>`;
                 }
             }
