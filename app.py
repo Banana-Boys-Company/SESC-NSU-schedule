@@ -140,7 +140,7 @@ for item in BANNER_DATA["new_data"]:
     filename = item.split("/")[-1]
     if filename not in os.listdir(PROJECT_ROOT + "/static/images/banner"):
         shutil.copyfile(
-            f"/mnt/sesc-share/background/{filename}", PROJECT_ROOT + f"/static/{filename}")
+            f"/mnt/sesc-share/background/{filename}", PROJECT_ROOT + f"/static/images/banner/{filename}")
 
 
 def update_banner_data():
@@ -155,10 +155,8 @@ def update_banner_data():
             is_online = True
         files = [f"images/banner/{element}" for element in files if element.endswith(
             (".png", ".jpeg", ".jpg", ".gif", ".webm"))]
-        print(BANNER_DATA["new_data"])
         for file in BANNER_DATA["new_data"]:
             if file not in files:
-                print(file)
                 if file not in BANNER_DATA["old_data"]:
                     BANNER_DATA["old_data"].append(files)
                 try:
@@ -171,9 +169,9 @@ def update_banner_data():
                 if file not in BANNER_DATA["new_data"]:
                     filename = file.split("/")[-1]
                     if filename not in os.listdir(PROJECT_ROOT + f"/static/images/banner"):
-                        print(os.listdir(PROJECT_ROOT + f"/static/images/banner"))
                         shutil.copyfile(
                             f"/mnt/sesc-share/background/{filename}", PROJECT_ROOT + f"/static/images/banner/{filename}")
+
         BANNER_DATA["new_data"] = deepcopy(files)
         new_data = deepcopy(BANNER_DATA)
         new_data["new_data"] = [urllib.parse.quote_plus(item).replace(r"%2F", "/")
