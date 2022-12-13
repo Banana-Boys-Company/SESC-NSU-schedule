@@ -40,7 +40,7 @@ VALID_CLASSES = ["9_1", "9_2", "10_1", "10_2", "10_3", "10_4", "10_5", "10_6", "
 
 
 def parse_both_tables(bar_is_on=False, only_courses=False):
-    logging.log(msg="Начало парсинга обеих таблиц...")
+    logging.info(msg="Начало парсинга обеих таблиц...")
     parser = pars.ScheduleParser('data.xlsx')
     if only_courses is True:
         dict3 = parser.parse_cources("СПЕЦКУРСЫ")
@@ -52,7 +52,7 @@ def parse_both_tables(bar_is_on=False, only_courses=False):
     full_dict = merge_dicts(dict1, dict2)
     dict3 = parser.parse_cources("СПЕЦКУРСЫ")
     del dict1, dict2
-    logging.log(msg="Успешный парсинг!")
+    logging.info(msg="Успешный парсинг!")
     return full_dict, dict3
 
 
@@ -179,7 +179,7 @@ def update_banner_data():
 
 
 def update_schedule_json_data():
-    logging.log("Начало обновления exel данных...")
+    logging.info("Начало обновления exel данных...")
     global cashed_data
     global COURSES_DATA
     try:
@@ -189,10 +189,10 @@ def update_schedule_json_data():
         with open(PROJECT_ROOT + '/data.json', "r", encoding="cp1251") as f:
             cashed_data = json.load(f)
             COURSES_DATA = parse_both_tables(only_courses=True)
-        logging.log("Локальные JSON загружены")
+        logging.info("Локальные JSON загружены")
     else:
         cashed_data, COURSES_DATA = parse_both_tables(bar_is_on=True)
-    logging.log("Exel данные обновлены!")
+    logging.info("Exel данные обновлены!")
 
 
 scheduler = BackgroundScheduler()
