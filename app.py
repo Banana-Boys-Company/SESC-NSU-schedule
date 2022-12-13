@@ -139,7 +139,7 @@ for item in BANNER_DATA["new_data"]:
     filename = item.split("/")[-1]
     if filename not in os.listdir(PROJECT_ROOT + "/static/images/banner"):
         shutil.copyfile(
-            f"/mnt/sesc-share/background/{filename}", "/static/images/banner/{}".format(filename))
+            f"/mnt/sesc-share/background/{filename}", f"/static/{filename}")
 
 
 def update_banner_data():
@@ -169,7 +169,7 @@ def update_banner_data():
                     filename = file.split("/")[-1]
                     if filename not in os.listdir(PROJECT_ROOT + f"/static/images/banner"):
                         shutil.copyfile(
-                            f"/mnt/sesc-share/background/{filename}", f"/static/{filename}")
+                            f"/mnt/sesc-share/background/{filename}", f"/static/{file}")
         BANNER_DATA["new_data"] = deepcopy(files)
         new_data = deepcopy(BANNER_DATA)
         new_data["new_data"] = [urllib.parse.quote_plus(item).replace(r"%2F", "/")
