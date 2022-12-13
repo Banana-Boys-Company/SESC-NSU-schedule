@@ -153,12 +153,12 @@ def update_banner_data():
             is_online = False
         else:
             is_online = True
-        print("files", files)
         files = [f"images/banner/{element}" for element in files if element.endswith(
             (".png", ".jpeg", ".jpg", ".gif", ".webm"))]
-        print("adter", files)
+        print(BANNER_DATA["new_data"])
         for file in BANNER_DATA["new_data"]:
             if file not in files:
+                print(file)
                 if file not in BANNER_DATA["old_data"]:
                     BANNER_DATA["old_data"].append(files)
                 try:
@@ -334,5 +334,5 @@ eventlet.spawn(update_banner_data)
 
 if __name__ == '__main__':
     scheduler.start()
-    socketio.run(app, port=1735, host="0.0.0.0", debug=False,
+    socketio.run(app, port=1735, host="0.0.0.0", debug=True,
                  reloader_options={"reloader_type": 'stat'})
