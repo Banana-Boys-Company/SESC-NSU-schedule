@@ -5,6 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from modules.parser.common import department_to_id
 from flask_socketio import SocketIO, emit
 from copy import deepcopy
+import pathlib
 import modules.parser.parser as pars
 import logging
 import urllib.request
@@ -23,7 +24,8 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 socketio = SocketIO(app)
 logging.basicConfig(filename='output_log.log')
 
-
+SCRIPT_ROOT = pathlib.Path(__file__).parent.resolve()
+print(SCRIPT_ROOT)
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 logging.info(msg=f"ROOT директория: {PROJECT_ROOT}")
 DATABASE = os.path.join(PROJECT_ROOT, 'data', 'database.db')
@@ -139,7 +141,7 @@ for item in BANNER_DATA["new_data"]:
     filename = item.split("/")[-1]
     if filename not in os.listdir(PROJECT_ROOT + "/static/images/banner"):
         shutil.copyfile(
-            f"/mnt/sesc-share/background/{filename}", f"/static/{filename}")
+            f"/mnt/sesc-share/background/{filename}", PROJECT_ROOT + f"/static/{filename}")
 
 
 def update_banner_data():
@@ -169,7 +171,7 @@ def update_banner_data():
                     filename = file.split("/")[-1]
                     if filename not in os.listdir(PROJECT_ROOT + f"/static/images/banner"):
                         shutil.copyfile(
-                            f"/mnt/sesc-share/background/{filename}", f"/static/{file}")
+                            f"/mnt/sesc-share/background/{filename}", PROJECT_ROOT + f"/static/images/banner/{filename}")
         BANNER_DATA["new_data"] = deepcopy(files)
         new_data = deepcopy(BANNER_DATA)
         new_data["new_data"] = [urllib.parse.quote_plus(item).replace(r"%2F", "/")
@@ -251,6 +253,7 @@ def close_connection(exception):
 @app.route("/")
 def index():
     socketio.start_background_task(update_banner_data)
+    print(BANNER_DATA["new_data"])
     return render_template("table.html", banner_links=BANNER_DATA["new_data"])
 
 # admin token --> O4ymBcTmiAFVIop17RLc57sDf4lW3RBkWdyZpC-6MZ8
@@ -330,5 +333,5 @@ eventlet.spawn(update_banner_data)
 
 if __name__ == '__main__':
     scheduler.start()
-    socketio.run(app, port=1735, host="0.0.0.0", debug=True,
+    socketio.run(app, port=1735, host="0.0.0.0", debug=False,
                  reloader_options={"reloader_type": 'stat'})
