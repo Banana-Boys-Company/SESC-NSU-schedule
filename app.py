@@ -21,7 +21,7 @@ app.config['SECRET_KEY'] = '&85e8hE1%J2&eH(D*E8i2v)5DoquH*)D'
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data/database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 socketio = SocketIO(app)
-logging.basicConfig(filename='loggs.log', level=logging.BASIC_FORMAT)
+logging.basicConfig(filename='output_log.log')
 
 
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
@@ -139,7 +139,7 @@ for item in BANNER_DATA["new_data"]:
     filename = item.split("/")[-1]
     if filename not in os.listdir(PROJECT_ROOT + "/static/images/banner"):
         shutil.copyfile(
-            f"/mnt/sesc-share/background/{filename}", PROJECT_ROOT + "/static/{}".format(item))
+            f"/mnt/sesc-share/background/{filename}", "/static/images/banner/{}".format(item))
 
 
 def update_banner_data():
@@ -169,7 +169,7 @@ def update_banner_data():
                     filename = file.split("/")[-1]
                     if filename not in os.listdir(PROJECT_ROOT + f"/static/images/banner"):
                         shutil.copyfile(
-                            f"/mnt/sesc-share/background/{filename}", PROJECT_ROOT + f"/static/{file}")
+                            f"/mnt/sesc-share/background/{filename}", "/static/{file}")
         BANNER_DATA["new_data"] = deepcopy(files)
         new_data = deepcopy(BANNER_DATA)
         new_data["new_data"] = [urllib.parse.quote_plus(item).replace(r"%2F", "/")

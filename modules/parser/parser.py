@@ -8,6 +8,7 @@ from typing import IO
 from os.path import exists
 import io
 import progress.bar
+import logging
 try:
     from modules.parser.common import pattern, dow2dow, subj, validate_str, get_merged_cell_val, full_subj_name, \
         first_table_properties, ScheduleProperties, second_table_properties, merge_dicts, ProgressPlug, department_to_id
@@ -31,7 +32,7 @@ class ScheduleParser:
             self.wb: xl.Workbook = xl.load_workbook(table_path)
         else:
             raise FileNotFoundError('File does not exist')
-        print('File loaded!')
+        logging.info('Exel данные загружены')
 
     def parse(self, sheet_name: str, _prop: ScheduleProperties, fp: IO[str] = None, bar_is_on: bool = False):
 
