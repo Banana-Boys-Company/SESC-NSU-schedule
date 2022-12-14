@@ -23,7 +23,7 @@
 	<nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
 		<div class="container-fluid">
 			<!-- Логотип -->
-			<a class="navbar-brand" href="http://127.0.0.1">
+			<a class="navbar-brand" href="/">
 				<img src="https://education.nsu.ru/letka/images/tild3438-3932-4535-b763-356533303566__photo.png"
 					alt="logo" class="logo">
 			</a>
@@ -271,6 +271,25 @@
 </head>
 
 <body onload="timeCount();">
+	<script src="{{ url_for('static', filename='js/snowfall.jquery.js') }}"></script>
+	<script>
+		$(document).ready(function () {
+			$(document).snowfall({
+				flakeCount: 100, // Количество снежинок
+				flakeColor: '#ffffff', // Цвет снежинок
+				flakeIndex: 999999, // z-index снежинок
+				minSize: 1, // Минимальный размер снежинки
+				maxSize: 2, // Максимальный размер снежинки
+				minSpeed: 1, // Минимальная скорость снежинки
+				maxSpeed: 5, // Максимальная скорость снежинки
+				round: false, // Закруглённые снежинки (true/false)
+				shadow: false, // С тенью (true/false)
+				collection: false, // Накапливаются ли снизу, образуя сугробы (true/false)
+				collectionHeight: 200, // Количество накапливаемого снега
+				deviceorientation: true // Подстраиваться ли под устройство
+			});
+		});
+	</script>
 	<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
 		<symbol id="warning" fill="currentColor" viewBox="0 0 16 16">
 			<path
@@ -286,28 +305,28 @@
 	</div>
 
 	{% if banner_links != [] %}
-		<div id="banner" class="carousel slide" data-bs-ride="carousel">
-			<div class="ratio ratio-16x9 carousel-inner" id="carousel">
-				{% for item in banner_links %}
-				{% if loop.index0 == 0 %}
-				<div class="ratio ratio-16x9 carousel-item banner-element active banner-image">
-					{% else %}
-					<div class="ratio ratio-16x9 carousel-item banner-element banner-image">
-						{% endif %}
-						<img class="ratio ratio-16x9" src="{{ url_for('static', filename=item) }}" alt="Баннер">
-					</div>
-					{% endfor %}
+	<div id="banner" class="carousel slide" data-bs-ride="carousel">
+		<div class="ratio ratio-16x9 carousel-inner" id="carousel">
+			{% for item in banner_links %}
+			{% if loop.index0 == 0 %}
+			<div class="ratio ratio-16x9 carousel-item banner-element active banner-image">
+				{% else %}
+				<div class="ratio ratio-16x9 carousel-item banner-element banner-image">
+					{% endif %}
+					<img class="ratio ratio-16x9" src="{{ url_for('static', filename=item) }}" alt="Баннер">
 				</div>
-				<button class="carousel-control-prev" type="button" data-bs-target="#banner" data-bs-slide="prev">
-					<span class="carousel-control-prev-icon" aria-hidden="true"></span>
-					<span class="visually-hidden">Предыдущий</span>
-				</button>
-				<button class="carousel-control-next" type="button" data-bs-target="#banner" data-bs-slide="next">
-					<span class="carousel-control-next-icon" aria-hidden="true"></span>
-					<span class="visually-hidden">Следующий</span>
-				</button>
+				{% endfor %}
 			</div>
+			<button class="carousel-control-prev" type="button" data-bs-target="#banner" data-bs-slide="prev">
+				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Предыдущий</span>
+			</button>
+			<button class="carousel-control-next" type="button" data-bs-target="#banner" data-bs-slide="next">
+				<span class="carousel-control-next-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Следующий</span>
+			</button>
 		</div>
+	</div>
 	{% endif %}
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"

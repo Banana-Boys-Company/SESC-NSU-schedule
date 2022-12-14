@@ -193,7 +193,7 @@ def update_schedule_json_data():
             COURSES_DATA = parse_both_tables(only_courses=True)
         logging.info("Локальные JSON загружены")
     else:
-        cashed_data, COURSES_DATA = parse_both_tables(bar_is_on=True)
+        cashed_data, COURSES_DATA = parse_both_tables(bar_is_on=False)
     logging.info("Exel данные обновлены!")
 
 

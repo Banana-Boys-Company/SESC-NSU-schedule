@@ -1,7 +1,7 @@
 // [^-^]Hikaru#7106 - лучший кодер в мире
 
 // Подсоединение к сокет серверу бэка
-const socket = io.connect("http://10.100.1.39:1735")
+const socket = io.connect("http://10.100.1.39")
 
 // Таймер неактивности, поистечению 5 минут перезагрузка
 var timer_ = setTimeout(function () {
