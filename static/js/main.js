@@ -211,6 +211,11 @@ let week_pills = [null, "pills-Monday-tab", "pills-Tuesday-tab", "pills-Wednesda
 // Генерация расписания на основе данных с сервера
 function generate_schedule_table(data) {
     $('#main-page').empty() // отчистка места появления таблицы
+
+    // christmas update
+    $("html").css("background-image") != "url(\"/static/images/back/background.jpg\")" ? $("html").css({ "background-image": "url(\"/static/images/back/background.jpg\")" }) : null
+
+
     let response_data = element_id.split(":")
     let weekday = today.getDay()
     let weekDay_title = [
@@ -285,6 +290,10 @@ function generate_schedule_table(data) {
 
 function generate_courses_table(data) {
     $('#main-page').empty()
+
+    // christmas update
+    $("html").css("background-image") != "url(\"/static/images/back/background.jpg\")" ? $("html").css({ "background-image": "url(\"/static/images/back/background.jpg\")" }) : null
+
     let weekday = today.getDay()
     let weekDay_title = [
         `<div class="tab-pane fade${weekday == 1 ? "show active" : ""}" id="pills-Monday" role="tabpanel" aria-labelledby="pills-Monday-tab">`,
@@ -326,6 +335,11 @@ function generate_courses_table(data) {
 };
 function all_table(data_lst) {
     $('#main-page').empty()
+
+    // christmas update
+    $("html").css("background-image") != "url(\"/static/images/back/background.jpg\")" ? $("html").css({ "background-image": "url(\"/static/images/back/background.jpg\")" }) : null
+
+
     let response_data = element_id.split(":")
     let only_for_all = response_data[1].split("_")
     let weekday = today.getDay()
