@@ -271,33 +271,6 @@
 </head>
 
 <body onload="timeCount();">
-	<script src="{{ url_for('static', filename='js/snowfall.jquery.js') }}"></script>
-	<script>
-		$(document).ready(function () {
-			$(document).snowfall({
-				flakeCount: 100, // Количество снежинок
-				flakeColor: '#ffffff', // Цвет снежинок
-				flakeIndex: 0, // z-index снежинок
-				minSize: 1, // Минимальный размер снежинки
-				maxSize: 2, // Максимальный размер снежинки
-				minSpeed: 1, // Минимальная скорость снежинки
-				maxSpeed: 5, // Максимальная скорость снежинки
-				round: false, // Закруглённые снежинки (true/false)
-				shadow: false, // С тенью (true/false)
-				collection: false, // Накапливаются ли снизу, образуя сугробы (true/false)
-				collectionHeight: 200, // Количество накапливаемого снега
-				deviceorientation: true // Подстраиваться ли под устройство
-			});
-		});
-	</script>
-	<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-		<symbol id="warning" fill="currentColor" viewBox="0 0 16 16">
-			<path
-				d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
-		</symbol>
-	</svg>
-	<div id="error-modal" class="float-end sticky-top position-absolute top-0 end-0 mt-1 me-1 h-75 w-25">
-	</div>
 	<div id="main-page">
 		{% block table %}
 
@@ -305,7 +278,7 @@
 	</div>
 
 	{% if banner_links != [] %}
-	<div id="banner" class="carousel slide" data-bs-ride="carousel">
+	<div id="banner" class="carousel slide d-flex mx-auto" data-bs-ride="carousel">
 		<div class="ratio ratio-16x9 carousel-inner" id="carousel">
 			{% for item in banner_links %}
 			{% if loop.index0 == 0 %}

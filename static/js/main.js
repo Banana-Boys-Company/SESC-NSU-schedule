@@ -1,7 +1,7 @@
 // [^-^]Hikaru#7106 - лучший кодер в мире
 
 // Подсоединение к сокет серверу бэка
-const socket = io.connect("http://10.100.1.39")
+const socket = io.connect("http://127.0.0.1:1735")
 
 // Таймер неактивности, поистечению 5 минут перезагрузка
 var timer_ = setTimeout(function () {
@@ -59,33 +59,7 @@ $(document).ready(function () {
         if (click == true) {
             click = false;
             buttonTimeOut();
-        } else {
-            let new_warning =
-                $(`<div class="alert alert-warning w-75 float-end align-items-center" id="timeout-alert">
-                    <svg class="bi flex-shrink-0 me-2" width="24" height="24">
-                        <use xlink:href="#warning" />
-                    </svg>
-                    <button type="button" class="close-warning float-end btn align-center" data-dismiss="alert">x</button>
-                    <strong class="">Предупреждение!</strong>
-                    <p class="text-start text-wrap">Подождите немного перед повторным использованием</p>
-                    <div class="progress">
-                        <div class="progress-bar" role="progressbar progress-bar-striped progress-bar-animated"
-                            aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                        </div>
-                    </div>
-                </div>`)
-            $("#error-modal").append(new_warning)
-            $("#error-modal").children().slice(-1)[0]
-            $(".weekday-button").attr({ "aria-disabled": "true" }).addClass('disabled')
-            new_warning.fadeTo(2000, 500).slideUp(500, function () {
-                new_warning.slideUp(500);
-                new_warning.children(".progress")
-            });
-            let progressBar = $($($($("#error-modal").children().slice(-1)[0]).children(".progress")).children(".progress-bar"))
-            progressBar.animate({ width: "0%" }, 500);
-            progressBar.delay(500).fadeOut(500);
         }
-
     });
     function buttonTimeOut() {
         setTimeout(function () {

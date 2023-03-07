@@ -4,3 +4,4 @@ data.json
 courses.json
 data.xlsx
 *.pyc
+venv/

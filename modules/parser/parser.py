@@ -7,7 +7,7 @@ import copy
 from typing import IO
 from os.path import exists
 import io
-import progress.bar
+# import progress.bar
 import logging
 try:
     from modules.parser.common import pattern, dow2dow, subj, validate_str, get_merged_cell_val, full_subj_name, \
@@ -53,8 +53,10 @@ class ScheduleParser:
         row_to_day_of_the_week = dict()
         previous_day = ''
         if bar_is_on:
-            bar = progress.bar.ChargingBar(
-                f'Parsing {sheet_name}', max=_prop.progress)
+            print("работаем")
+            # bar = progress.bar.ChargingBar(
+            # f'Parsing {sheet_name}', max=_prop.progress)
+            bar = ProgressPlug
         else:
             bar = ProgressPlug
         # endregion
@@ -68,7 +70,7 @@ class ScheduleParser:
                 continue
             classes.setdefault(__v, dict())
             classes[__v].setdefault(__val, dict())
-            bar.next()
+            # bar.next()
         # endregion
         # They`re not needed anymore
         del __v, i, __val, column
@@ -78,7 +80,7 @@ class ScheduleParser:
             # region First column. Data - days of week. Creating dictonary {row: day_of_week}
             if i == 0:
                 for row_, cell_ in enumerate(column[2:]):
-                    bar.next()
+                    # bar.next()
                     value = get_merged_cell_val(ws, cell_)
                     if type(cell_) == Cell and (cell_.value is not None):
                         if not [s for s in ws.merged_cells.ranges if cell_.coordinate in s]:
@@ -117,7 +119,7 @@ class ScheduleParser:
                 for row, cell in enumerate(column[2:]):
                     # Getting value of cell
                     val = validate_str(get_merged_cell_val(ws, cell))
-                    bar.next()
+                    # bar.next()
                     # Filtrating empty rows
                     if val == 'None':
                         if cell.row not in self.prop.useless_rows:
@@ -162,13 +164,13 @@ class ScheduleParser:
                     _day = __dict[__day]
                     for __lesson in _day:
                         __lesson[1] //= 2
-                        bar.next()
+                        # bar.next()
                 # endregion
 
                 # Writing data in main dictionary
                 classes[class_num][group_num] = __dict
         # endregion
-        bar.finish()
+        # bar.finish()
 
         # region Returning json with unicode characters
         if fp:

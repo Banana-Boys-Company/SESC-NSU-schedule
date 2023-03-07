@@ -46,9 +46,9 @@ def parse_both_tables(bar_is_on=False, only_courses=False):
     if only_courses is True:
         dict3 = parser.parse_cources("СПЕЦКУРСЫ")
         return dict3
-    dict1 = parser.parse('Расписание_1 сем',
+    dict1 = parser.parse('Расписание 2 семестр',
                          first_table_properties, bar_is_on=bar_is_on)
-    dict2 = parser.parse('Расписание_1сем_2пол.дня',
+    dict2 = parser.parse('Расписание_2сем_2пол.дня',
                          second_table_properties, bar_is_on=bar_is_on)
     full_dict = merge_dicts(dict1, dict2)
     dict3 = parser.parse_cources("СПЕЦКУРСЫ")

@@ -1,0 +1,5 @@
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 431-923-094
+WARNING:apscheduler.executors.default:Run time of job "update_schedule_json_data (trigger: interval[0:30:00], next run at: 2023-03-07 14:34:08 +07)" was missed by 0:22:33.935419
+WARNING:apscheduler.executors.default:Run time of job "update_schedule_json_data (trigger: interval[0:30:00], next run at: 2023-03-07 14:34:15 +07)" was missed by 0:22:27.087336
